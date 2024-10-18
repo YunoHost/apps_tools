@@ -38,6 +38,10 @@ class GithubAPI:
         """Get a list of commits for project."""
         return self.internal_api(f"repos/{self.upstream_repo}/commits")
 
+    def tip_of_branch(self, branch: str) -> Any:
+        """Get SHA of commit that's tip of provided branch"""
+        return self.internal_api(f"repos/{self.upstream_repo}/branches/{branch}")["commit"]
+
     def releases(self) -> list[dict[str, Any]]:
         """Get a list of releases for project."""
         return self.internal_api(f"repos/{self.upstream_repo}/releases?per_page=100")
