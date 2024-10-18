@@ -120,6 +120,16 @@ class GitlabAPI:
             )
         ]
 
+    def tip_of_branch(self, branch: str) -> Any:
+        """Get SHA of commit that's tip of provided branch"""
+        commit = self.internal_api(
+            f"projects/{self.project_id}/repository/branches/{branch}"
+        )["commit"]
+        return {
+            "sha": commit["id"],
+            "commit": {"author": {"date": commit["committed_date"]}},
+        }
+
     def releases(self) -> list[dict[str, Any]]:
         """Get a list of releases for project."""
         releases = self.internal_api(f"projects/{self.project_id}/releases")
@@ -195,6 +205,16 @@ class GiteaForgejoAPI:
     def commits(self) -> list[dict[str, Any]]:
         """Get a list of commits for project."""
         return self.internal_api(f"repos/{self.project_path}/commits")
+
+    def tip_of_branch(self, branch: str) -> Any:
+        """Get SHA of commit that's tip of provided branch"""
+        commit = self.internal_api(f"repos/{self.project_path}/branches/{branch}")[
+            "commit"
+        ]
+        return {
+            "sha": commit["id"],
+            "commit": {"author": {"date": commit["timestamp"]}},
+        }
 
     def releases(self) -> list[dict[str, Any]]:
         """Get a list of releases for project."""
