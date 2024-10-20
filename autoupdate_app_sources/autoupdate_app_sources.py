@@ -455,6 +455,7 @@ class AppAutoUpdater:
         upstream = autoupdate.get("upstream", self.main_upstream)
         version_re = autoupdate.get("version_regex", None)
         allow_prereleases = autoupdate.get("allow_prereleases", False)
+        branch_name = autoupdate.get("branch", None)
         _, remote_type, revision_type = strategy.split("_")
 
         api: Union[GithubAPI, GitlabAPI, GiteaForgejoAPI, DownloadPageAPI]
@@ -550,8 +551,12 @@ class AppAutoUpdater:
                 raise ValueError(
                     "For the latest commit strategies, only asset = 'tarball' is supported"
                 )
-            commits = api.commits()
-            latest_commit = commits[0]
+            latest_commit = None
+            if branch_name is None:
+                commits = api.commits()
+                latest_commit = commits[0]
+            else:
+                latest_commit = api.tip_of_branch(branch_name)
             latest_tarball = api.url_for_ref(latest_commit["sha"], RefType.commits)
             # Let's have the version as something like "2023.01.23"
             latest_commit_date = datetime.strptime(
