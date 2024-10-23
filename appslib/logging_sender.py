@@ -11,7 +11,7 @@ def notify(message: str, channel: str, markdown: bool = False) -> None:
     chan_dir = {
         "dev": "!oUChrIGPjhUkpgjYCW:matrix.org",
         "apps": "!PauySEslPVuJCJCwlZ:matrix.org",
-        "doc": "!OysWrSrQatFMrZROPJ:aria-net.org"
+        "doc": "!OysWrSrQatFMrZROPJ:aria-net.org",
     }
 
     if not any(channel in x for x in chan_dir):
