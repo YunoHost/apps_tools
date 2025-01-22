@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2024-03-31 19:33+0200\n"
-"PO-Revision-Date: 2024-06-20 19:43+0000\n"
-"Last-Translator: Satuk Bug <satukby2@gmail.com>\n"
+"PO-Revision-Date: 2025-01-22 18:49+0000\n"
+"Last-Translator: Furkan Samed Acet <f16bursafurkan@outlook.com>\n"
 "Language-Team: Turkish <https://translate.yunohost.org/projects/yunohost/"
 "readme-generator/tr/>\n"
 "Language: tr\n"
@@ -23,11 +23,11 @@ msgstr ""
 #: templates/ALL_README.md.j2:11
 #, python-format
 msgid "Read the README in %(language)s"
-msgstr ""
+msgstr "README(BENİOKU)'yu%(language)s dilinde oku"
 
 #: templates/README.md.j2:2
 msgid "Packaging an app, starting from this example"
-msgstr ""
+msgstr "Bu örnekten başlayarak,bir uygulama paketleme"
 
 #: templates/README.md.j2:4
 #, fuzzy
@@ -43,13 +43,16 @@ msgstr ""
 
 #: templates/README.md.j2:5
 msgid "Edit the `manifest.toml` with app specific info"
-msgstr ""
+msgstr "`manifest.toml`'u özel bir uygulama bilgisi ile düzenle"
 
 #: templates/README.md.j2:6
+#, fuzzy
 msgid ""
 "Edit the `install`, `upgrade`, `remove`, `backup` and `restore` scripts, and "
 "any relevant conf files in `conf/`"
 msgstr ""
+"``,``,``,``ve`` script(betik)lerini ve `conf/`dizinindeki ilgili "
+"yapılandırma dosyalarını düzenleyin."
 
 #: templates/README.md.j2:7
 msgid ""
