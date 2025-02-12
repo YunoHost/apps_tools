@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2024-03-31 19:33+0200\n"
-"PO-Revision-Date: 2024-03-31 21:42+0000\n"
+"PO-Revision-Date: 2025-02-13 19:54+0000\n"
 "Last-Translator: xabirequejo <xabi.rn@gmail.com>\n"
 "Language-Team: Basque <https://translate.yunohost.org/projects/yunohost/"
 "readme-generator/eu/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.3.1\n"
+"X-Generator: Weblate 5.4.3\n"
 "Generated-By: Babel 2.14.0\n"
 
 #: templates/ALL_README.md.j2:11
@@ -222,7 +222,7 @@ msgstr "Bidali `pull request`a [`testing` abarrera](%(testing_branch_url)s)."
 
 #: templates/README.md.j2:83
 msgid "To try the `testing` branch, please proceed like that:"
-msgstr "`testing` abarra probatzeko, ondorengoa egin:"
+msgstr "`testing` abarra probatzeko, honakoa egin:"
 
 #: templates/README.md.j2:87
 msgid "or"
