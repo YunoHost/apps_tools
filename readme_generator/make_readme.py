@@ -60,6 +60,28 @@ def generate_READMEs(app_path: Path, apps_repo_path: Path):
         )
         return
 
+    # prepare new home for stuff
+    if not os.path.exists(app_path / "doc" / "readme"):
+        os.makedirs(app_path / "doc" / "readme")
+    
+    # clean up old entries from root of repo
+    for entry in app_path.iterdir():
+        # only pick files (no folder) on the root of 'screenshots'
+        if not entry.is_file():
+            continue
+        if entry.name.startswith("README") or entry.name == "ALL_README.md":
+            os.remove(entry)
+
+    # mark readmes as generated in .gitattributes
+    gitattributes = ""
+    if os.path.exists(app_path / ".gitattributes"):
+        gitattributes = (app_path / ".gitattributes").read_text()
+
+    print(f'Looking {gitattributes.find("*README*.md linguist-generated=true")}')
+    if gitattributes.find("*README*.md linguist-generated=true") == -1:
+        gitattributes = "*README*.md linguist-generated=true\n" + gitattributes
+        (app_path / ".gitattributes").write_text(gitattributes)
+
     poparser = PoFileParser({})
     poparser.parse((README_GEN_DIR / "messages.pot").open(encoding="utf-8"))
 
@@ -110,9 +132,9 @@ def generate_READMEs(app_path: Path, apps_repo_path: Path):
             # ignore '.gitkeep' or any file whose name begins with a dot
             if entry.name.startswith("."):
                 continue
-            screenshots.append(str(entry.relative_to(app_path)))
+            screenshots.append("../screenshots/" + entry.name)
 
-    def generate_single_README(lang_suffix: str, lang: str):
+    def generate_single_README(lang_suffix: str, lang: str, screenshots: List[str], target_path: Path, rel_path: str):
         env = Environment(
             loader=FileSystemLoader(README_GEN_DIR / "templates"),
             extensions=["jinja2.ext.i18n"],
@@ -165,13 +187,14 @@ def generate_READMEs(app_path: Path, apps_repo_path: Path):
             disclaimer=disclaimer,
             antifeatures=antifeatures,
             manifest=manifest,
+            rel_path=rel_path,
         )
-        (app_path / f"README{lang_suffix}.md").write_text(out)
+        (target_path / f"README{lang_suffix}.md").write_text(out)
 
-    generate_single_README("", "en")
+    generate_single_README("", "en",screenshots=[f.replace("..", "doc") for f in screenshots], target_path=app_path, rel_path="doc/readme")
 
     for lang in fully_translated_langs:
-        generate_single_README("_" + lang, lang)
+        generate_single_README("_" + lang, lang, screenshots=screenshots, target_path = app_path / "doc" / "readme", rel_path=".")
 
     links_to_other_READMEs = []
     for language in fully_translated_langs:
@@ -189,7 +212,7 @@ def generate_READMEs(app_path: Path, apps_repo_path: Path):
     out: str = env.get_template("ALL_README.md.j2").render(
         links_to_other_READMEs=links_to_other_READMEs
     )
-    (app_path / "ALL_README.md").write_text(out)
+    (app_path / "doc" / "readme" / "ALL_README.md").write_text(out)
 
 
 def main():
