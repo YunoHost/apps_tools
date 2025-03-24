@@ -10,7 +10,6 @@ tomlkit
 lxml
 jsonschema
 beautifulsoup4
-websockets==10.0
 babel
 langcodes
 language_data
