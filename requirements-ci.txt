@@ -1,0 +1,11 @@
+tqdm
+jinja2
+GitPython
+PyGithub
+pyyaml
+toml
+tomlkit
+lxml
+jsonschema
+beautifulsoup4
+requests
