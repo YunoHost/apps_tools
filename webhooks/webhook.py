@@ -141,7 +141,11 @@ def on_push(request: Request) -> HTTPResponse:
                 need_push = need_push or result
 
             repo.git.checkout(branch)
-            result = generate_and_commit_readmes(repo)
+
+            result = False
+            if not "no_readme" in repo.head.commit.message:
+                result = generate_and_commit_readmes(repo)
+            
             need_push = need_push or result
 
             if not need_push:
