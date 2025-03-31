@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2024-03-31 19:33+0200\n"
-"PO-Revision-Date: 2024-03-25 07:12+0000\n"
-"Last-Translator: OniriCorpe <oniricorpe@disroot.org>\n"
+"PO-Revision-Date: 2025-04-01 02:16+0000\n"
+"Last-Translator: demodé <walter.klosse@protonmail.com>\n"
 "Language-Team: Czech <https://translate.yunohost.org/projects/yunohost/"
 "readme-generator/cs/>\n"
 "Language: cs\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Weblate 5.3.1\n"
+"X-Generator: Weblate 5.4.3\n"
 "Generated-By: Babel 2.14.0\n"
 
 #: templates/ALL_README.md.j2:11
@@ -128,13 +128,11 @@ msgid "Maintenance status"
 msgstr "Stav údržby"
 
 #: templates/README.md.j2:26
-#, fuzzy, python-format
+#, python-format
 msgid "Install %(application_name)s with YunoHost"
-msgstr "Instalovat %(application_name)s do YunoHost"
+msgstr "Instalovat %(application_name)s s YunoHost"
 
 #: templates/README.md.j2:28
-#, fuzzy
-#| msgid "Read this README is other languages."
 msgid "Read this README in other languages."
 msgstr "Přečíst toto README v jiných jazycích."
 
@@ -225,7 +223,7 @@ msgstr ""
 
 #: templates/README.md.j2:87
 msgid "or"
-msgstr ""
+msgstr "nebo"
 
 #: templates/README.md.j2:91
 msgid "More info regarding app packaging:"
