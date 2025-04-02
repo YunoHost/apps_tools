@@ -24,7 +24,6 @@ from appslib import get_apps_repo
 from readme_generator.make_readme import generate_READMEs
 
 TOOLS_DIR = Path(__file__).resolve().parent.parent
-APPS_REPO = None
 
 DEBUG = False
 UNSAFE = False
@@ -281,7 +280,7 @@ def reject_wishlist(request: Request, pr_infos: dict, reason=None) -> HTTPRespon
 
 def generate_and_commit_readmes(repo: Repo) -> bool:
     assert repo.working_tree_dir is not None
-    generate_READMEs(Path(repo.working_tree_dir), APPS_REPO)
+    generate_READMEs(Path(repo.working_tree_dir))
 
     repo.git.add("README*.md")
     repo.git.add("ALL_README.md")
