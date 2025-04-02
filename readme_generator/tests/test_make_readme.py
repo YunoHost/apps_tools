@@ -31,7 +31,7 @@ def test_running_make_readme():
         result_content = (test_app_dir / "README.md").read_text()
         if test_content != result_content:
             shutil.copyfile(
-                TEST_DIRECTORY / "README.md", TEST_DIRECTORY / "README_failed.md"
+                test_app_dir / "README.md", TEST_DIRECTORY / "README_failed.md"
             )
 
         assert (
