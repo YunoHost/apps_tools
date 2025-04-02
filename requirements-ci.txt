@@ -1,7 +1,5 @@
 tqdm
 jinja2
-aiohttp
-sanic==21.12.2
 GitPython
 PyGithub
 pyyaml
@@ -10,7 +8,4 @@ tomlkit
 lxml
 jsonschema
 beautifulsoup4
-babel
-langcodes
-language_data
 requests
