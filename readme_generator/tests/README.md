@@ -15,7 +15,7 @@ Fast ActivityPub social network server written in Go
 <img align="center" src="https://img.shields.io/badge/Version:-gray?style=flat-square" alt="Version">&nbsp;&nbsp;<span>0.13.3~ynh1</span>
 
 [![🌐 Official app website](https://img.shields.io/badge/Official_app_website-009600?style=for-the-badge)](https://gotosocial.org/) 
-[![CI: Level 7](https://img.shields.io/badge/Automatic%20test%20results-Level%207-009600?style=for-the-badge)](https://ci-apps.yunohost.org/ci/apps/gotosocial)
+[![CI: Level 7](https://img.shields.io/badge/Automatic%20test%20results-Level%207-009600?style=for-the-badge)](https://ci-apps.yunohost.org/ci/apps/gotosocial/)
 
 <a href="https://apps.yunohost.org/app/gotosocial"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_more_info_on_the_appstore.svg"/></a>
 <a href="https://github.com/YunoHost-Apps/gotosocial_ynh/issues"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_report_an_issue.svg"/></a>
