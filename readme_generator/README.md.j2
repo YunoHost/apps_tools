@@ -33,7 +33,7 @@ It shall NOT be edited by hand.
 
 {% if manifest.upstream.website %}[![🌐 Official app website](https://img.shields.io/badge/Official_app_website-009600?style=for-the-badge)]({{manifest.upstream.website}})
 {% endif %}{% if manifest.upstream.demo %}[![App Demo](https://img.shields.io/badge/App_Demo-blue?style=for-the-badge)]({{manifest.upstream.demo}})
-{% endif %}
+{% endif %}[![CI level](https://img.shields.io/badge/Automatic%20test%20results-Level%20{{ CI.level }}-009600?style=for-the-badge)](https://ci-apps.yunohost.org/ci/apps/{{ manifest.id }})
 
 <a href="https://apps.yunohost.org/app/{{manifest.id}}"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_more_info_on_the_appstore.svg"/></a>
 <a href="https://github.com/YunoHost-Apps/{{manifest.id}}_ynh/issues"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_report_an_issue.svg"/></a>
