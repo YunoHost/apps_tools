@@ -20,6 +20,8 @@ Fast ActivityPub social network server written in Go
 
 ## 📦 Developer info
 
+[![Automatic tests level](https://apps.yunohost.org/badge/cilevel/gotosocial)](https://ci-apps.yunohost.org/ci/apps/gotosocial/)
+
 🛠️ Upstream GoToSocial repository: <https://github.com/superseriousbusiness/gotosocial>
 
 Pull request are welcome and should target the [`testing` branch](https://github.com/YunoHost-Apps/gotosocial_ynh/tree/testing).
