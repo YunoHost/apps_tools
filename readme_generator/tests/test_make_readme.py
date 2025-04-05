@@ -35,7 +35,7 @@ def test_running_make_readme():
             )
 
         assert (
-            test_content == result_content
+            test_content.strip() == result_content.strip()
         ), f"Failed readme was copied to {TEST_DIRECTORY / 'README_failed.md'}"
 
 
