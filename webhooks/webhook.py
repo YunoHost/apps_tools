@@ -210,6 +210,8 @@ def bump_revision(request: Request, pr_infos: dict) -> HTTPResponse:
                 author=Actor("yunohost-bot", "yunohost@yunohost.org"),
             )
 
+            generate_and_commit_readmes(repo)
+
             logging.debug(f"Pushing {repository}")
             repo.remote().push(quiet=False, all=True)
             return response.text("ok")
