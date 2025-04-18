@@ -283,12 +283,13 @@ def reject_wishlist(request: Request, pr_infos: dict, reason=None) -> HTTPRespon
 def generate_and_commit_readmes(repo: Repo) -> bool:
     assert repo.working_tree_dir is not None
     generate_READMEs(Path(repo.working_tree_dir))
-    diff_empty = len(repo.index.diff("HEAD")) == 0
-    if diff_empty:
-        return False
 
     for change in repo.index.diff(None):
         repo.git.add(change.b_path)
+
+    diff_empty = len(repo.index.diff("HEAD")) == 0
+    if diff_empty:
+        return False
 
     repo.index.commit(
         "Auto-update READMEs", author=Actor("yunohost-bot", "yunohost@yunohost.org")
