@@ -4,7 +4,7 @@ It shall NOT be edited by hand.
 -->
 
 <h1>
-  <img src="https://raw.githubusercontent.com/YunoHost/apps/master/logos/gotosocial.png" width="32px" alt="Logo of GoToSocial">
+  <img src="https://raw.githubusercontent.com/YunoHost/apps/main/logos/gotosocial.png" width="32px" alt="Logo of GoToSocial">
   GoToSocial, packaged for YunoHost
 </h1>
 
