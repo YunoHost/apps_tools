@@ -135,7 +135,7 @@ def on_push(request: Request) -> HTTPResponse:
             )
 
             # First rebase the testing branch if possible
-            if branch in ["master", "testing"]:
+            if branch in ["main", "master", "testing"]:
                 result = git_repo_rebase_testing_fast_forward(repo)
                 need_push = need_push or result
 
@@ -302,10 +302,15 @@ def git_repo_rebase_testing_fast_forward(repo: Repo) -> bool:
         repo.git.checkout("testing")
     except GitCommandError:
         return False
-    if not repo.is_ancestor("testing", "master"):
-        return False
-    repo.git.merge("master", ff_only=True)
-    return True
+    if repo.is_ancestor("testing", "main"):
+        repo.git.merge("main", ff_only=True)
+        return True
+
+    elif repo.is_ancestor("testing", "master"):
+        repo.git.merge("master", ff_only=True)
+        return True
+
+    return False
 
 
 def main() -> None:
