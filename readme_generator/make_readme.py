@@ -21,8 +21,8 @@ def url_exists(url):
             return True
         else:
             return False
-    except requests.exceptions.RequestException as e:
-        raise Exception("Can't check URL'")
+    except requests.exceptions.RequestException as err:
+        raise Exception("Can't check URL:", err)
         
         
 def generate_READMEs(app_path: Path):
