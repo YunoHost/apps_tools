@@ -82,8 +82,7 @@ async def regen_readme(repository, branch):
 
         generate_READMEs(Path(folder))
 
-        await git(["add", "README*.md"], in_folder=folder)
-        await git(["add", "ALL_README.md"], in_folder=folder)
+        await git(["add", "README.md"], in_folder=folder)
 
         diff_not_empty = await asyncio.create_subprocess_shell(
             " ".join(["git", "diff", "HEAD", "--compact-summary"]),

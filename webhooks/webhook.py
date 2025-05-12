@@ -24,7 +24,6 @@ from appslib import get_apps_repo
 from readme_generator.make_readme import generate_READMEs
 
 TOOLS_DIR = Path(__file__).resolve().parent.parent
-APPS_REPO = None
 
 DEBUG = False
 UNSAFE = False
@@ -136,7 +135,7 @@ def on_push(request: Request) -> HTTPResponse:
             )
 
             # First rebase the testing branch if possible
-            if branch in ["master", "testing"]:
+            if branch in ["main", "master", "testing"]:
                 result = git_repo_rebase_testing_fast_forward(repo)
                 need_push = need_push or result
 
@@ -211,6 +210,8 @@ def bump_revision(request: Request, pr_infos: dict) -> HTTPResponse:
                 author=Actor("yunohost-bot", "yunohost@yunohost.org"),
             )
 
+            generate_and_commit_readmes(repo)
+
             logging.debug(f"Pushing {repository}")
             repo.remote().push(quiet=False, all=True)
             return response.text("ok")
@@ -281,10 +282,10 @@ def reject_wishlist(request: Request, pr_infos: dict, reason=None) -> HTTPRespon
 
 def generate_and_commit_readmes(repo: Repo) -> bool:
     assert repo.working_tree_dir is not None
-    generate_READMEs(Path(repo.working_tree_dir), APPS_REPO)
+    generate_READMEs(Path(repo.working_tree_dir))
 
-    repo.git.add("README*.md")
-    repo.git.add("ALL_README.md")
+    for change in repo.index.diff(None):
+        repo.git.add(change.b_path)
 
     diff_empty = len(repo.index.diff("HEAD")) == 0
     if diff_empty:
@@ -301,10 +302,15 @@ def git_repo_rebase_testing_fast_forward(repo: Repo) -> bool:
         repo.git.checkout("testing")
     except GitCommandError:
         return False
-    if not repo.is_ancestor("testing", "master"):
-        return False
-    repo.git.merge("master", ff_only=True)
-    return True
+    if repo.is_ancestor("testing", "main"):
+        repo.git.merge("main", ff_only=True)
+        return True
+
+    elif repo.is_ancestor("testing", "master"):
+        repo.git.merge("master", ff_only=True)
+        return True
+
+    return False
 
 
 def main() -> None:
