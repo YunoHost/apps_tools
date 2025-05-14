@@ -541,6 +541,10 @@ class AppAutoUpdater:
                     "For the latest tag strategies, only asset = 'tarball' is supported"
                 )
             tags = [t["name"] for t in api.tags()]
+            if self.app_id == "snweb":
+                # Stupid ad-hoc patch for snweb which has a gazillion tags for different components in their repo
+                # and we need to get to second page to get the ones relevant for the app ...
+                tags += [t["name"] for t in api.internal_api(f"repos/{api.upstream_repo}/tags?per_page=100&page=2")]
             latest_version_orig, latest_version = self.relevant_versions(
                 tags, self.app_id, version_re
             )
