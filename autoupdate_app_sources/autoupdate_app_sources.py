@@ -544,7 +544,12 @@ class AppAutoUpdater:
             if self.app_id == "snweb":
                 # Stupid ad-hoc patch for snweb which has a gazillion tags for different components in their repo
                 # and we need to get to second page to get the ones relevant for the app ...
-                tags += [t["name"] for t in api.internal_api(f"repos/{api.upstream_repo}/tags?per_page=100&page=2")]
+                tags += [
+                    t["name"]
+                    for t in api.internal_api(
+                        f"repos/{api.upstream_repo}/tags?per_page=100&page=2"
+                    )
+                ]
             latest_version_orig, latest_version = self.relevant_versions(
                 tags, self.app_id, version_re
             )
@@ -823,7 +828,9 @@ def main() -> None:
         paste_message += f"\n{'=' * 80}\nApps failed:"
         matrix_message += f"\n- {len(apps_failed)} failed apps updates: {', '.join(str(app) for app in apps_failed.keys())}\n"
     for app, logs in apps_failed.items():
-        manifest_url = f"https://github.com/YunoHost-Apps/{app}_ynh/blob/testing/manifest.toml"
+        manifest_url = (
+            f"https://github.com/YunoHost-Apps/{app}_ynh/blob/testing/manifest.toml"
+        )
         paste_message += f"\n{'='*40}\n{app}\n{'-'*40}\n{logs[0]}\n{logs[1]}\n\nLink to manifest: {manifest_url}\n\n"
 
     if args.paste:
