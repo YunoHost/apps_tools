@@ -52,6 +52,10 @@ STRATEGIES = [
 ]
 
 
+class AutoUpdateError(RuntimeError):
+    pass
+
+
 @cache
 def get_github() -> tuple[
     Optional[tuple[str, str]],
@@ -113,7 +117,7 @@ class LocalOrRemoteRepo:
             self.manifest_path = app / "manifest.toml"
 
             if not self.manifest_path.exists():
-                raise RuntimeError(f"{app.name}: manifest.toml doesnt exists?")
+                raise AutoUpdateError(f"{app.name}: manifest.toml doesnt exists?")
             # app is in fact a path
             self.manifest_raw = (
                 (app / "manifest.toml").open("r", encoding="utf-8").read()
@@ -204,7 +208,7 @@ class AppAutoUpdater:
         self.main_upstream = self.manifest.get("upstream", {}).get("code")
 
         if not self.sources:
-            raise RuntimeError("There's no resources.sources in manifest.toml ?")
+            raise AutoUpdateError("There's no resources.sources in manifest.toml ?")
 
         self.main_upstream = self.manifest.get("upstream", {}).get("code")
         self.latest_commit_weekly = False
@@ -345,7 +349,7 @@ class AppAutoUpdater:
         # reverse=True will set the last release as first element
         tags_dict = dict(sorted(tags_dict.items(), reverse=True))
         if not tags_dict:
-            raise RuntimeError("No tags were found after sanity filtering!")
+            raise AutoUpdateError("No tags were found after sanity filtering!")
         the_tag_list, (the_tag_orig, the_tag_clean) = next(iter(tags_dict.items()))
         assert the_tag_list is not None
         return the_tag_orig, the_tag_clean
@@ -369,7 +373,7 @@ class AppAutoUpdater:
                 m.update(data)
             return m.hexdigest()
         except Exception as e:
-            raise RuntimeError(f"Failed to compute sha256 for {url} : {e}") from e
+            raise AutoUpdateError(f"Failed to compute sha256 for {url} : {e}") from e
 
     def get_source_update(
         self, name: str, infos: dict[str, Any]
@@ -420,7 +424,7 @@ class AppAutoUpdater:
             or isinstance(assets, str)
             and not isinstance(infos.get("url"), str)
         ):
-            raise RuntimeError(
+            raise AutoUpdateError(
                 "It looks like there's an inconsistency between the old asset list and the new ones... "
                 "One is arch-specific, the other is not... Did you forget to define arch-specific regexes? "
                 f"New asset url is/are : {assets}"
@@ -443,11 +447,11 @@ class AppAutoUpdater:
             name: url for name, url in assets.items() if re.match(regex, name)
         }
         if not matching_assets:
-            raise RuntimeError(
+            raise AutoUpdateError(
                 f"No assets matching regex '{regex}' in {list(assets.keys())}"
             )
         if len(matching_assets) > 1:
-            raise RuntimeError(
+            raise AutoUpdateError(
                 f"Too many assets matching regex '{regex}': {matching_assets}"
             )
         return next(iter(matching_assets.items()))
@@ -512,8 +516,8 @@ class AppAutoUpdater:
                 try:
                     _, url = self.find_matching_asset(latest_assets, asset)
                     return latest_version, url, latest_release_html_url
-                except RuntimeError as e:
-                    raise RuntimeError(
+                except AutoUpdateError as e:
+                    raise AutoUpdateError(
                         f"{e}.\nFull release details on {latest_release_html_url}."
                     ) from e
 
@@ -523,8 +527,8 @@ class AppAutoUpdater:
                     try:
                         _, url = self.find_matching_asset(latest_assets, asset_regex)
                         new_assets[asset_name] = url
-                    except RuntimeError as e:
-                        raise RuntimeError(
+                    except AutoUpdateError as e:
+                        raise AutoUpdateError(
                             f"{e}.\nFull release details on {latest_release_html_url}."
                         ) from e
                 return latest_version, new_assets, latest_release_html_url
@@ -699,6 +703,9 @@ def run_autoupdate_for_multiprocessing(data) -> tuple[str, tuple[State, str, str
         autoupdater.latest_commit_weekly = latest_commit_weekly
         result = autoupdater.run(edit=edit, commit=commit, pr=pr)
         return (app, result)
+    except AutoUpdateError as e:
+        log_str = stdoutswitch.reset()
+        return (app, (State.failure, log_str, str(e), ""))
     except Exception:
         log_str = stdoutswitch.reset()
         import traceback
