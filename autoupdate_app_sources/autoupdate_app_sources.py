@@ -823,7 +823,8 @@ def main() -> None:
         paste_message += f"\n{'=' * 80}\nApps failed:"
         matrix_message += f"\n- {len(apps_failed)} failed apps updates: {', '.join(str(app) for app in apps_failed.keys())}\n"
     for app, logs in apps_failed.items():
-        paste_message += f"\n{'='*40}\n{app}\n{'-'*40}\n{logs[0]}\n{logs[1]}\n\n"
+        manifest_url = f"https://github.com/YunoHost-Apps/{app}_ynh/blob/testing/manifest.toml"
+        paste_message += f"\n{'='*40}\n{app}\n{'-'*40}\n{logs[0]}\n{logs[1]}\n\nLink to manifest: {manifest_url}\n\n"
 
     if args.paste:
         paste_url = paste_on_haste(paste_message)
