@@ -837,6 +837,8 @@ def main() -> None:
         paste_url = paste_on_haste(paste_message)
         matrix_message += f"\nSee the full log here: {paste_url}"
 
+    matrix_message += "\nAutoupdate dashboard: https://apps.yunohost.org/dash?filter=autoupdate"
+
     appslib.logging_sender.notify(matrix_message, "apps", markdown=True)
     print(paste_message)
 
