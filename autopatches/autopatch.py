@@ -62,12 +62,10 @@ class AppToPatch:
         appdir = AppDir(self.id, self.path)
         appdir.ensure(self.info["url"], self.info.get("branch", "master"), False, False)
 
-
     def default_branch(self) -> str:
         ref = self.repo.refs["origin/HEAD"].ref
         branch = ref.name.split("/")[1]
         return branch
-
 
     def reset(self) -> None:
         if self.get_diff():
