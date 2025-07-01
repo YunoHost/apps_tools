@@ -215,7 +215,7 @@ def build_app_dict(app, infos, cache_path: Path):
         except Exception:
             # This will typically fail if the ref of the commit is unknown because it's only a single-branch checkout
             # ... BUT it could also be a super-old commit and we only have the last X commits in our checkout to optimize space hmpf
-            ahead = False
+            ahead = True
 
         alternative_branches[branch] = {
             # NB : this is the latest commit tested by the dev CI, not the top of the branch
