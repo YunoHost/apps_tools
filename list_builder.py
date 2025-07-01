@@ -223,7 +223,7 @@ def build_app_dict(app, infos, cache_path: Path):
             "timestamp": result_infos["commit_timestamp"],
             "ahead": ahead,
             "version": result_infos["app_version"],
-            "pr_url": result_infos["pr_url"]
+            "pr_url": result_infos["pr_url"],
         }
 
     # Build the dict with all the infos
