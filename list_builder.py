@@ -204,7 +204,6 @@ def build_app_dict(app, infos, cache_path: Path):
     alternative_branches = {}
     dev_ci_result_for_this_app = dev_ci_result_per_branch().get(app, {})
     for branch, result_infos in dev_ci_result_for_this_app.items():
-        alternative_branches = {}
         # For now, we only advertise testing.
         # We'll probably advertise another branch specifically for Nextcloud.
         # Maybe we should design a proper mechanism to declare somewhere what alternative branch exist
