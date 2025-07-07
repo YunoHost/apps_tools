@@ -45,6 +45,7 @@ git_pull_and_restart_services() {
 
 }
 
+# shellcheck disable=SC2034
 rebuild_catalog_error_msg="[list_builder] Rebuilding the application list failed miserably!"
 rebuild_catalog() {
     date
@@ -53,6 +54,7 @@ rebuild_catalog() {
     venv/bin/python3 list_builder.py -l .apps -c .apps_cache ../catalog/default
 }
 
+# shellcheck disable=SC2034
 autoupdate_app_sources_error_msg="[autoupdate_app_sources] App sources auto-update failed miserably!"
 autoupdate_app_sources() {
     date
@@ -62,6 +64,7 @@ autoupdate_app_sources() {
         -l .apps -c .apps_cache --latest-commit-weekly --edit --commit --pr --paste -j1
 }
 
+# shellcheck disable=SC2034
 update_app_levels_error_msg="[update_app_levels] Updating apps level failed miserably!"
 update_app_levels() {
     date
