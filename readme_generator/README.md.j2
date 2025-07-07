@@ -40,8 +40,10 @@ It shall NOT be edited by hand.
 
 [![Automatic tests level](https://apps.yunohost.org/badge/cilevel/{{manifest.id}})](https://ci-apps.yunohost.org/ci/apps/{{manifest.id}}/)
 
+{% if manifest.upstream and manifest.upstream.code -%}
 🛠️ Upstream {{manifest.name}} repository: <{{manifest.upstream.code}}>
 
+{% endif -%}
 Pull request are welcome and should target the [`testing` branch](https://github.com/YunoHost-Apps/{{manifest.id}}_ynh/tree/testing).
 
 The `testing` branch can be tested using:
