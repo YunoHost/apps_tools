@@ -5,6 +5,7 @@ import copy
 import json
 import logging
 import multiprocessing
+import requests
 import shutil
 import subprocess
 import time
@@ -49,6 +50,16 @@ def antifeatures_list():
     for antifeature_id, infos in new_antifeatures.items():
         infos["id"] = antifeature_id
     return list(new_antifeatures.values())
+
+
+@cache
+def dev_ci_result_per_branch():
+    url = "https://ci-apps-dev.yunohost.org/ci/api/results-dev"
+    try:
+        return requests.get(url).json()
+    except Exception as e:
+        logging.error(f"[List builder] Failed to fetch the CI apps dev result : {e}")
+        return {}
 
 
 ################################
@@ -190,6 +201,31 @@ def build_app_dict(app, infos, cache_path: Path):
     # Find timestamp corresponding to that commit
     timestamp = repo.commit(infos["revision"]).committed_date
 
+    alternative_branches = {}
+    dev_ci_result_for_this_app = dev_ci_result_per_branch().get(app, {})
+    for branch, result_infos in dev_ci_result_for_this_app.items():
+        # For now, we only advertise testing.
+        # We'll probably advertise another branch specifically for Nextcloud.
+        # Maybe we should design a proper mechanism to declare somewhere what alternative branch exist
+        if branch != "testing":
+            continue
+        try:
+            ahead = not repo.is_ancestor(result_infos["commit"], infos["branch"])
+        except Exception:
+            # This will typically fail if the ref of the commit is unknown because it's only a single-branch checkout
+            # ... BUT it could also be a super-old commit and we only have the last X commits in our checkout to optimize space hmpf
+            ahead = True
+
+        alternative_branches[branch] = {
+            # NB : this is the latest commit tested by the dev CI, not the top of the branch
+            "revision": result_infos["commit"],
+            "level": result_infos["level"],
+            "timestamp": result_infos["commit_timestamp"],
+            "ahead": ahead,
+            "version": result_infos["app_version"],
+            "pr_url": result_infos["pr_url"],
+        }
+
     # Build the dict with all the infos
     if (this_app_cache / "manifest.toml").exists():
         manifest = toml.load(
@@ -205,6 +241,7 @@ def build_app_dict(app, infos, cache_path: Path):
             "revision": infos["revision"],
             "url": infos["url"],
         },
+        "alternative_branches": alternative_branches,
         "added_in_catalog": infos["added_in_catalog"],
         "lastUpdate": timestamp,
         "manifest": manifest,

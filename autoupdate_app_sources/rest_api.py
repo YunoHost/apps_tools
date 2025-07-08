@@ -32,7 +32,7 @@ class GithubAPI:
 
     def tags(self) -> list[dict[str, str]]:
         """Get a list of tags for project."""
-        return self.internal_api(f"repos/{self.upstream_repo}/tags")
+        return self.internal_api(f"repos/{self.upstream_repo}/tags?per_page=100")
 
     def commits(self) -> list[dict[str, Any]]:
         """Get a list of commits for project."""
