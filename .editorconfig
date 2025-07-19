@@ -16,3 +16,6 @@ trim_trailing_whitespace = true
 
 [**_fr.md]
 spelling_language = fr
+
+[**.yml]
+indent_size = 2
