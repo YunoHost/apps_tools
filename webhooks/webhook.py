@@ -158,7 +158,8 @@ def on_push(request: Request) -> HTTPResponse:
 
 
 def on_pr_comment(request: Request, pr_infos: dict) -> HTTPResponse:
-    body = request.json["comment"]["body"].strip()[:100].lower()
+    fullbody = request.json["comment"]["body"]
+    body = fullbody.strip()[:100].lower()
 
     # Check the comment contains proper keyword trigger
 
@@ -172,7 +173,7 @@ def on_pr_comment(request: Request, pr_infos: dict) -> HTTPResponse:
         changelog = ""
         for command in CHANGELOG_COMMANDS:
             try:
-                changelog = re.search(f"{command} (.*)", body).group(1).rstrip()
+                changelog = re.search(f"{command} (.*)", fullbody).group(1).rstrip()
             except:
                 pass
         add_changelog(request, pr_infos, changelog)
@@ -183,7 +184,7 @@ def on_pr_comment(request: Request, pr_infos: dict) -> HTTPResponse:
         reason = ""
         for command in REJECT_WISHLIST_COMMANDS:
             try:
-                reason = re.search(f"{command} (.*)", body).group(1).rstrip()
+                reason = re.search(f"{command} (.*)", fullbody).group(1).rstrip()
             except:
                 pass
         reject_wishlist(request, pr_infos, reason)
