@@ -167,6 +167,17 @@ def on_pr_comment(request: Request, pr_infos: dict) -> HTTPResponse:
         bump_revision(request, pr_infos)
         return response.text("ok")
 
+    CHANGELOG_COMMANDS = ["!changelog", "!pre_upgrade", "!preupgrade"]
+    if any(trigger.lower() in body for trigger in CHANGELOG_COMMANDS):
+        changelog = ""
+        for command in CHANGELOG_COMMANDS:
+            try:
+                changelog = re.search(f"{command} (.*)", body).group(1).rstrip()
+            except:
+                pass
+        add_changelog(request, pr_infos, changelog)
+        return response.text("ok")
+
     REJECT_WISHLIST_COMMANDS = ["!reject", "!nope"]
     if any(trigger.lower() in body for trigger in REJECT_WISHLIST_COMMANDS):
         reason = ""
@@ -208,6 +219,41 @@ def bump_revision(request: Request, pr_infos: dict) -> HTTPResponse:
             repo.index.commit(
                 "Bump package revision",
                 author=Actor("yunohost-bot", "yunohost@yunohost.org"),
+            )
+
+            generate_and_commit_readmes(repo)
+
+            logging.debug(f"Pushing {repository}")
+            repo.remote().push(quiet=False, all=True)
+            return response.text("ok")
+
+
+def add_changelog(request: Request, pr_infos: dict, changelog=None) -> HTTPResponse:
+    data = request.json
+    repository = data["repository"]["full_name"]
+    branch = pr_infos["head"]["ref"]
+
+    if repository.startswith("YunoHost-Apps/"):
+
+        logging.info(f"Will add changelog on {repository} branch {branch}...")
+        with tempfile.TemporaryDirectory() as folder_str:
+            folder = Path(folder_str)
+            repo = Repo.clone_from(
+                f"https://{github_login()}:{github_token()}@github.com/{repository}",
+                to_path=folder,
+            )
+            repo.git.checkout(branch)
+
+            manifest_file = folder / "manifest.toml"
+            manifest = tomlkit.load(manifest_file.open("r", encoding="utf-8"))
+            version = manifest["version"]
+
+            repo.create_file(
+                f"doc/PRE_UPGRADE.d/{version}.md",
+                f"Add pre_upgrade message for {version}",
+                f"{changelog}",
+                author=Actor("yunohost-bot", "yunohost@yunohost.org")
+                branch=branch
             )
 
             generate_and_commit_readmes(repo)
