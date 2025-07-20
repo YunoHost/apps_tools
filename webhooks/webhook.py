@@ -173,7 +173,7 @@ def on_pr_comment(request: Request, pr_infos: dict) -> HTTPResponse:
         changelog = ""
         for command in CHANGELOG_COMMANDS:
             try:
-                changelog = re.search(f"{command} (.*)", fullbody).group(1).rstrip()
+                changelog = re.search(f"{command} (.*)", fullbody, re.DOTALL).group(1).rstrip()
             except:
                 pass
         add_changelog(request, pr_infos, changelog)
