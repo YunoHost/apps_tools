@@ -19,12 +19,24 @@ def generate_READMEs(app_path: Path):
 
     manifest = toml.load(open(app_path / "manifest.toml"))
 
+    screenshots: List[str] = []
+    screenshots_dir = app_path / "doc" / "screenshots"
+    if screenshots_dir.exists():
+        for entry in sorted(screenshots_dir.iterdir()):
+            # only pick files (no folder) on the root of 'screenshots'
+            if not entry.is_file():
+                continue
+            # ignore '.gitkeep' or any file whose name begins with a dot
+            if entry.name.startswith("."):
+                continue
+            screenshots.append(str(entry.relative_to(app_path)))
+
     env = Environment(
         loader=FileSystemLoader(README_GEN_DIR),
     )
     template = env.get_template("README.md.j2")
 
-    out: str = template.render(manifest=manifest)
+    out: str = template.render(manifest=manifest, screenshots=screenshots)
     (app_path / "README.md").write_text(out)
 
     # Delete legacy READMEs
