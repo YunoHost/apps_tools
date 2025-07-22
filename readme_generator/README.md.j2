@@ -37,9 +37,9 @@ It shall NOT be edited by hand.
 </div>
 
 {% if screenshots %}
-## {{ _("Screenshots") }}
+## Screenshots
 {% for screenshot in screenshots -%}
-    ![{{ _("Screenshot of %(application_name)s")|format(application_name=manifest.name) }}](./{{screenshot}})
+    ![{{ "Screenshot of %(application_name)s"|format(application_name=manifest.name) }}](./{{screenshot}})
 {% endfor %}
 {% endif -%}
 
