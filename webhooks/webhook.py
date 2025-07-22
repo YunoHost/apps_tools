@@ -253,7 +253,7 @@ def add_changelog(request: Request, pr_infos: dict, changelog=None) -> HTTPRespo
                 f"doc/PRE_UPGRADE.d/{version}.md",
                 f"Add pre_upgrade message for {version}",
                 f"{changelog}",
-                author=Actor("yunohost-bot", "yunohost@yunohost.org")
+                author=Actor("yunohost-bot", "yunohost@yunohost.org"),
                 branch=branch
             )
 
