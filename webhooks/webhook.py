@@ -257,7 +257,6 @@ def add_changelog(request: Request, pr_infos: dict, changelog=None) -> HTTPRespo
                 branch=branch
             )
 
-            generate_and_commit_readmes(repo)
 
             logging.debug(f"Pushing {repository}")
             repo.remote().push(quiet=False, all=True)
