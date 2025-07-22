@@ -173,7 +173,11 @@ def on_pr_comment(request: Request, pr_infos: dict) -> HTTPResponse:
         changelog = ""
         for command in CHANGELOG_COMMANDS:
             try:
-                changelog = re.search(f"{command}\s*(.*)", fullbody, re.DOTALL).group(1).rstrip()
+                changelog = (
+                    re.search(f"{command}\s*(.*)", fullbody, re.DOTALL)
+                    .group(1)
+                    .rstrip()
+                )
             except:
                 pass
         return add_changelog(request, pr_infos, changelog)
@@ -254,9 +258,8 @@ def add_changelog(request: Request, pr_infos: dict, changelog=None) -> HTTPRespo
             f"Add pre_upgrade message for {version}",
             f"{changelog}",
             author=Actor("yunohost-bot", "yunohost@yunohost.org"),
-            branch=branch
+            branch=branch,
         )
-
 
         logging.debug(f"Pushing {repository}")
         repo.remote().push(quiet=False, all=True)
