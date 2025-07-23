@@ -95,7 +95,7 @@ def apps_cache_update_all(
             app,
             cache_path / app,
             info["url"],
-            info.get("branch", "master"),
+            info.get("branch", "main"),
             url_ssh,
             all_branches,
         )
