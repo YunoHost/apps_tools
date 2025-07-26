@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd scripts/
+pushd scripts/ || true
 
 if grep -q 'ynh_legacy_permissions' upgrade || grep -q 'ynh_permission_' install
 then
@@ -15,6 +15,7 @@ then
     exit 0
 fi
 
+# shellcheck disable=SC2016
 CONFIGURE_PERMISSION_DURING_INSTALL='
 # Make app public if necessary
 if [ \"\$is_public\" -eq 1 ]
@@ -23,6 +24,7 @@ then
 fi
 '
 
+# shellcheck disable=SC2016
 MIGRATE_LEGACY_PERMISSIONS='
 #=================================================
 # Migrate legacy permissions to new system
@@ -34,8 +36,7 @@ then
 	ynh_app_setting_delete --app=\$app --key=is_public
 fi'
 
-for SCRIPT in "remove upgrade backup restore change_url"
-do
+for SCRIPT in remove upgrade backup restore change_url; do
     [[ -e $SCRIPT ]] || continue
 
     perl -p0e 's@.*ynh_app_setting_.*protected_.*@@g' -i $SCRIPT

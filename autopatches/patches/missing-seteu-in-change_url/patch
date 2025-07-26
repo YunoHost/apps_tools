@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd scripts/
+cd scripts/ || true
 
 if [ ! -e change_url ] || grep -q 'ynh_abort_if_errors' change_url
 then
