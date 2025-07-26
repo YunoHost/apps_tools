@@ -253,12 +253,16 @@ def add_changelog(request: Request, pr_infos: dict, changelog=None) -> HTTPRespo
         manifest = tomlkit.load(manifest_file.open("r", encoding="utf-8"))
         version = manifest["version"]
 
-        repo.create_file(
-            f"doc/PRE_UPGRADE.d/{version}.md",
+        file = Path(f"{folder}/doc/PRE_UPGRADE.d/{version}.md")
+        file.parent.mkdir(parents=True, exist_ok=True)
+
+        with open(file, "a") as f:
+            f.write(f"{changelog}")
+
+        repo.git.add(file)
+        repo.index.commit(
             f"Add pre_upgrade message for {version}",
-            f"{changelog}",
             author=Actor("yunohost-bot", "yunohost@yunohost.org"),
-            branch=branch,
         )
 
         logging.debug(f"Pushing {repository}")
