@@ -252,7 +252,9 @@ def add_changelog(request: Request, pr_infos: dict, changelog=None) -> HTTPRespo
         manifest_file = folder / "manifest.toml"
         manifest = tomlkit.load(manifest_file.open("r", encoding="utf-8"))
         version = manifest["version"]
-        file = f"{folder}/doc/PRE_UPGRADE.d/{version}.md"
+
+        file = Path(f"{folder}/doc/PRE_UPGRADE.d/{version}.md")
+        file.parent.mkdir(parents=True, exist_ok=True)
 
         with open(file, "a") as f:
             f.write(f"{changelog}")
