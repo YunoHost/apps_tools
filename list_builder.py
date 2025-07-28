@@ -182,7 +182,7 @@ def build_app_dict(app, infos, cache_path: Path):
     infos["added_in_catalog"] = infos.get("added_date", 0)
     # int(commit_timestamps_for_this_app_in_catalog.split("\n")[0])
 
-    infos["branch"] = infos.get("branch", "master")
+    infos["branch"] = infos.get("branch", "main")
     infos["revision"] = infos.get("revision", "HEAD")
 
     # If using head, find the most recent meaningful commit in logs
