@@ -8,12 +8,12 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import requests
 
+ITEMS_LIMIT=100
 
 class RefType(Enum):
     tags = 1
     commits = 2
     releases = 3
-
 
 class GithubAPI:
     def __init__(self, upstream: str, auth: Optional[tuple[str, str]] = None):
@@ -32,7 +32,7 @@ class GithubAPI:
 
     def tags(self) -> list[dict[str, str]]:
         """Get a list of tags for project."""
-        return self.internal_api(f"repos/{self.upstream_repo}/tags?per_page=100")
+        return self.internal_api(f"repos/{self.upstream_repo}/tags?per_page={ITEMS_LIMIT}"
 
     def commits(self) -> list[dict[str, Any]]:
         """Get a list of commits for project."""
@@ -46,7 +46,7 @@ class GithubAPI:
 
     def releases(self) -> list[dict[str, Any]]:
         """Get a list of releases for project."""
-        return self.internal_api(f"repos/{self.upstream_repo}/releases?per_page=100")
+        return self.internal_api(f"repos/{self.upstream_repo}/releases?per_page={ITEMS_LIMIT}"
 
     def url_for_ref(self, ref: str, ref_type: RefType) -> str:
         """Get a URL for a ref."""
@@ -108,7 +108,7 @@ class GitlabAPI:
 
     def tags(self) -> list[dict[str, str]]:
         """Get a list of tags for project."""
-        return self.internal_api(f"projects/{self.project_id}/repository/tags")
+        return self.internal_api(f"projects/{self.project_id}/repository/tags?per_page={ITEMS_LIMIT}"
 
     def commits(self) -> list[dict[str, Any]]:
         """Get a list of commits for project."""
@@ -134,7 +134,7 @@ class GitlabAPI:
 
     def releases(self) -> list[dict[str, Any]]:
         """Get a list of releases for project."""
-        releases = self.internal_api(f"projects/{self.project_id}/releases")
+        releases = self.internal_api(f"projects/{self.project_id}/releases?per_page={ITEMS_LIMIT}"
         retval = []
         for release in releases:
             r = {
@@ -202,7 +202,7 @@ class GiteaForgejoAPI:
 
     def tags(self) -> list[dict[str, Any]]:
         """Get a list of tags for project."""
-        return self.internal_api(f"repos/{self.project_path}/tags")
+        return self.internal_api(f"repos/{self.project_path}/tags?per_page={ITEMS_LIMIT}"
 
     def commits(self) -> list[dict[str, Any]]:
         """Get a list of commits for project."""
@@ -220,7 +220,7 @@ class GiteaForgejoAPI:
 
     def releases(self) -> list[dict[str, Any]]:
         """Get a list of releases for project."""
-        return self.internal_api(f"repos/{self.project_path}/releases")
+        return self.internal_api(f"repos/{self.project_path}/releases?per_page={ITEMS_LIMIT}"
 
     def url_for_ref(self, ref: str, _: RefType) -> str:
         """Get a URL for a ref."""
