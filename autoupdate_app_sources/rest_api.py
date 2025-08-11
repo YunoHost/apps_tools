@@ -38,6 +38,12 @@ class GithubAPI:
         """Get a list of commits for project."""
         return self.internal_api(f"repos/{self.upstream_repo}/commits")
 
+    def tip_of_branch(self, branch: str) -> Any:
+        """Get SHA of commit that's tip of provided branch"""
+        return self.internal_api(f"repos/{self.upstream_repo}/branches/{branch}")[
+            "commit"
+        ]
+
     def releases(self) -> list[dict[str, Any]]:
         """Get a list of releases for project."""
         return self.internal_api(f"repos/{self.upstream_repo}/releases?per_page={ITEMS_LIMIT}"
@@ -63,7 +69,7 @@ class GitlabAPI:
     def __init__(self, upstream: str):
         # Find gitlab api root...
         self.forge_root = self.get_forge_root(upstream).rstrip("/")
-        self.project_path = upstream.replace(self.forge_root, "").lstrip("/")
+        self.project_path = upstream.replace(self.forge_root, "").strip("/")
         self.project_id = self.find_project_id(self.project_path)
 
     def get_forge_root(self, project_url: str) -> str:
@@ -115,6 +121,16 @@ class GitlabAPI:
                 f"projects/{self.project_id}/repository/commits"
             )
         ]
+
+    def tip_of_branch(self, branch: str) -> Any:
+        """Get SHA of commit that's tip of provided branch"""
+        commit = self.internal_api(
+            f"projects/{self.project_id}/repository/branches/{branch}"
+        )["commit"]
+        return {
+            "sha": commit["id"],
+            "commit": {"author": {"date": commit["committed_date"]}},
+        }
 
     def releases(self) -> list[dict[str, Any]]:
         """Get a list of releases for project."""
@@ -191,6 +207,16 @@ class GiteaForgejoAPI:
     def commits(self) -> list[dict[str, Any]]:
         """Get a list of commits for project."""
         return self.internal_api(f"repos/{self.project_path}/commits")
+
+    def tip_of_branch(self, branch: str) -> Any:
+        """Get SHA of commit that's tip of provided branch"""
+        commit = self.internal_api(f"repos/{self.project_path}/branches/{branch}")[
+            "commit"
+        ]
+        return {
+            "sha": commit["id"],
+            "commit": {"author": {"date": commit["timestamp"]}},
+        }
 
     def releases(self) -> list[dict[str, Any]]:
         """Get a list of releases for project."""

@@ -4,9 +4,10 @@ set -Eeuo pipefail
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 update_venv() {
-    if [ -d "venv" ]; then
-        venv/bin/pip install -r requirements.txt >/dev/null
+    if [ ! -d "venv" ]; then
+        python3 -m venv venv
     fi
+    venv/bin/pip install -r requirements.txt >/dev/null
 }
 
 update_apps_repo() {
@@ -18,7 +19,7 @@ update_apps_repo() {
 }
 
 update_apps_cache() {
-    ./app_caches.py -d -l .apps -c .apps_cache -j20
+    venv/bin/python3 ./app_caches.py -d -l .apps -c .apps_cache -j20
 }
 
 git_pull_and_restart_services() {
@@ -34,18 +35,7 @@ git_pull_and_restart_services() {
     fi
 
     # Cron
-    cat cron | sed "s@__BASEDIR__@$SCRIPT_DIR@g" > /etc/cron.d/apps_tools
-
-    pushd app_generator > /dev/null
-        update_venv
-        pushd static >/dev/null
-            ./tailwindcss-linux-x64 --input tailwind-local.css --output tailwind.css --minify
-        popd >/dev/null
-    popd > /dev/null
-    systemctl restart appgenerator
-    sleep 3
-    systemctl --quiet is-active appgenerator || sendxmpppy "[appgenerator] Uhoh, failed to (re)start the appgenerator service?"
-
+    sed "s@__BASEDIR__@$SCRIPT_DIR@g" > /etc/cron.d/apps_tools < cron
 
     update_venv
 
@@ -77,15 +67,7 @@ update_app_levels() {
     date
     update_apps_repo
     update_apps_cache
-    venv/bin/python3 update_app_levels.py -l .apps -c .apps_cache
-}
-
-safe_run() {
-    logfile="$SCRIPT_DIR/$1.log"
-    error_msg_var="${1}_error_msg"
-    if ! "$@" &>> "$logfile"; then
-        sendxmpppy "${!error_msg_var}"
-    fi
+    venv/bin/python3 update_app_levels/update_app_levels.py -r "git@github.com:YunoHost/apps.git" -c .apps_cache
 }
 
 main() {
@@ -97,7 +79,10 @@ main() {
         APPS_TOOLS_UPDATED=1 exec "$0" "$@"
     fi
 
-    safe_run "$@"
+    if ! "$@"; then
+        error_msg_var="${1}_error_msg"
+        sendxmpppy "${!error_msg_var}"
+    fi
 }
 
 main "$@"

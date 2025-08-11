@@ -14,7 +14,13 @@ import appslib.get_apps_repo as get_apps_repo
 def git_bisect(repo: Repo, is_newer: Callable[[Commit], bool]) -> Commit | None:
     # Start with whole repo
     first_commit = repo.git.rev_list("HEAD", reverse=True, max_parents=0)
-    repo.git.bisect("reset")
+    try:
+        # If a git bisect is in progress, just erase it
+        repo.git.bisect("log")
+        repo.git.bisect("reset")
+    except Exception:
+        pass
+
     repo.git.bisect("start", "--no-checkout", "HEAD", first_commit)
 
     while True:
@@ -72,7 +78,6 @@ def date_added(repo: Repo, name: str) -> int | None:
 
 def date_deprecated(repo: Repo, name: str) -> int | None:
     result = git_bisect(repo, lambda x: app_is_deprecated(x, name))
-    print(result)
     return None if result is None else result.committed_date
 
 
@@ -84,6 +89,7 @@ def add_deprecation_dates(repo: Repo, file: Path) -> None:
             continue
         if "deprecated-software" not in info.get("antifeatures", []):
             continue
+        logging.info(f"Searching deprecated date for {app}...")
         date = date_deprecated(repo, app)
         if date is None:
             continue
@@ -116,6 +122,7 @@ def add_apparition_dates(repo: Repo, file: Path, key: str) -> None:
     for app, info in document.items():
         if key in info.keys():
             continue
+        logging.info(f"Searching added date for {key}...")
         date = date_added_to(repo, f"[{app}]", file)
         assert date is not None
         info[key] = date
@@ -126,10 +133,11 @@ def add_apparition_dates(repo: Repo, file: Path, key: str) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--debug", action="store_true")
     get_apps_repo.add_args(parser, allow_temp=False)
     args = parser.parse_args()
 
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO)
 
     apps_repo_dir = get_apps_repo.from_args(args)
     apps_repo = Repo(apps_repo_dir)

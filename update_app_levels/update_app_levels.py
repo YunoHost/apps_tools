@@ -38,7 +38,7 @@ def github_token() -> Optional[str]:
 
 
 def get_ci_results() -> dict[str, dict[str, Any]]:
-    return requests.get(CI_RESULTS_URL, timeout=10).json()
+    return requests.get(CI_RESULTS_URL, timeout=60).json()
 
 
 def ci_result_is_outdated(result) -> bool:
@@ -171,7 +171,7 @@ def make_pull_request(pr_body: str) -> None:
         "title": "Update app levels according to CI results",
         "body": pr_body,
         "head": "update_app_levels",
-        "base": "master",
+        "base": "main",
     }
 
     with requests.Session() as s:
@@ -226,7 +226,7 @@ def main():
     # Load the app catalog and filter out the non-working ones
     catalog = tomlkit.load(apps_toml_path.open("r", encoding="utf-8"))
 
-    new_branch = apps_repo.create_head("update_app_levels", apps_repo.refs.master)
+    new_branch = apps_repo.create_head("update_app_levels", apps_repo.refs.main)
     apps_repo.head.reference = new_branch
 
     logging.info("Retrieving the CI results...")

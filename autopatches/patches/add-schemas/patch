@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-MANIFEST_SCHEMA_LINE='#:schema https://raw.githubusercontent.com/YunoHost/apps/master/schemas/manifest.v2.schema.json'
-TESTS_SCHEMA_LINE='#:schema https://raw.githubusercontent.com/YunoHost/apps/master/schemas/tests.v1.schema.json'
-CONFIGPANEL_SCHEMA_LINE='#:schema https://github.com/YunoHost/apps/raw/master/schemas/config_panel.v1.schema.json'
+MANIFEST_SCHEMA_LINE='#:schema https://raw.githubusercontent.com/YunoHost/apps/main/schemas/manifest.v2.schema.json'
+TESTS_SCHEMA_LINE='#:schema https://raw.githubusercontent.com/YunoHost/apps/main/schemas/tests.v1.schema.json'
+CONFIGPANEL_SCHEMA_LINE='#:schema https://github.com/YunoHost/apps/raw/main/schemas/config_panel.v1.schema.json'
 
 
 if [ -f "manifest.toml" ]; then

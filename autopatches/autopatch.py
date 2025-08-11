@@ -62,11 +62,17 @@ class AppToPatch:
         appdir = AppDir(self.id, self.path)
         appdir.ensure(self.info["url"], self.info.get("branch", "master"), False, False)
 
+    def default_branch(self) -> str:
+        ref = self.repo.refs["origin/HEAD"].ref
+        branch = ref.name.split("/")[1]
+        return branch
+
     def reset(self) -> None:
         if self.get_diff():
             logging.warning("%s had local changes, they were stashed.", self.id)
             self.repo.git.stash("save")
         self.repo.git.checkout("testing")
+        # self.repo.git.checkout(self.default_branch())
 
     def apply(self, patch: str) -> None:
         current_branch = self.repo.active_branch

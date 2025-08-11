@@ -8,9 +8,13 @@ import logging.handlers
 def notify(message: str, channel: str, markdown: bool = False) -> None:
     print(f"{channel} -> {message}")
 
-    chan_list = ["dev", "apps", "doc"]
+    chan_dir = {
+        "dev": "!oUChrIGPjhUkpgjYCW:matrix.org",
+        "apps": "!PauySEslPVuJCJCwlZ:matrix.org",
+        "doc": "!OysWrSrQatFMrZROPJ:aria-net.org",
+    }
 
-    if not any(channel in x for x in chan_list):
+    if not any(channel in x for x in chan_dir):
         logging.error(
             f"Provided chan '{channel}' is not part of the available options ('dev', 'apps', 'doc')."
         )
@@ -19,15 +23,11 @@ def notify(message: str, channel: str, markdown: bool = False) -> None:
         message = message.replace(char, "")
 
     command = [
-        "/var/www/webhooks/matrix-commander",
+        "/usr/bin/matrix-commander-rs",
         "--message",
         message,
-        "--credentials",
-        "/var/www/webhooks/credentials.json",
-        "--store",
-        "/var/www/webhooks/store",
         "--room",
-        f"yunohost-{channel}",
+        chan_dir[channel],
     ]
     if markdown:
         command.append("--markdown")
@@ -36,7 +36,7 @@ def notify(message: str, channel: str, markdown: bool = False) -> None:
         subprocess.call(command, stdout=subprocess.DEVNULL)
     except FileNotFoundError:
         logging.warning(
-            "The logging sender tool /var/www/webhooks/matrix-commander does not exist."
+            "The logging sender tool /usr/bin/matrix-commander-rs does not exist."
         )
     except subprocess.CalledProcessError as e:
         logging.warning(
