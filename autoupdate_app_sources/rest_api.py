@@ -202,7 +202,7 @@ class GiteaForgejoAPI:
 
     def tags(self) -> list[dict[str, Any]]:
         """Get a list of tags for project."""
-        return self.internal_api(f"repos/{self.project_path}/tags?limit={ITEMS_LIMIT}"
+        return self.internal_api(f"repos/{self.project_path}/tags?per_page={ITEMS_LIMIT}"
 
     def commits(self) -> list[dict[str, Any]]:
         """Get a list of commits for project."""
@@ -220,7 +220,7 @@ class GiteaForgejoAPI:
 
     def releases(self) -> list[dict[str, Any]]:
         """Get a list of releases for project."""
-        return self.internal_api(f"repos/{self.project_path}/releases?limit={ITEMS_LIMIT}"
+        return self.internal_api(f"repos/{self.project_path}/releases?per_page={ITEMS_LIMIT}"
 
     def url_for_ref(self, ref: str, _: RefType) -> str:
         """Get a URL for a ref."""
