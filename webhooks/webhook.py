@@ -356,11 +356,11 @@ def git_repo_rebase_testing_fast_forward(repo: Repo) -> bool:
         repo.git.checkout("testing")
     except GitCommandError:
         return False
-    if repo.is_ancestor("testing", "main"):
+
+    if "main" in repo.heads and repo.is_ancestor("testing", "main"):
         repo.git.merge("main", ff_only=True)
         return True
-
-    elif repo.is_ancestor("testing", "master"):
+    elif "master" in repo.heads and repo.is_ancestor("testing", "master"):
         repo.git.merge("master", ff_only=True)
         return True
 
