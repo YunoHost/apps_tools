@@ -27,9 +27,9 @@ from rest_api import (
     DownloadPageAPI,
     RefType,
 )  # noqa: E402,E501 pylint: disable=import-error,wrong-import-position
-import appslib.get_apps_repo as get_apps_repo
-import appslib.logging_sender  # noqa: E402 pylint: disable=import-error,wrong-import-position
-from appslib.utils import (
+from ..appslib import get_apps_repo
+from ..appslib import logging_sender  # noqa: E402 pylint: disable=import-error,wrong-import-position
+from ..appslib.utils import (
     get_catalog,
 )  # noqa: E402 pylint: disable=import-error,wrong-import-position
 
@@ -763,7 +763,7 @@ def main() -> None:
     get_apps_repo.add_args(parser)
     args = parser.parse_args()
 
-    appslib.logging_sender.enable()
+    logging_sender.enable()
 
     if args.commit and not args.edit:
         logging.error("--commit requires --edit")
@@ -841,7 +841,7 @@ def main() -> None:
         "\nAutoupdate dashboard: https://apps.yunohost.org/dash?filter=autoupdate"
     )
 
-    appslib.logging_sender.notify(matrix_message, "apps", markdown=True)
+    logging_sender.notify(matrix_message, "apps", markdown=True)
     print(paste_message)
 
 
