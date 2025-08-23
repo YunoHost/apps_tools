@@ -815,7 +815,7 @@ def main() -> None:
 
     if apps_updated:
         paste_message += f"\n{'=' * 80}\nApps updated:"
-        matrix_message += f"\n- {len(apps_updated)} new apps PRs"
+        matrix_message += f"\n- {len(apps_updated)} new apps PRs: {', '.join(str(app) for app in apps_updated.keys())}"
     for app, info in apps_updated.items():
         paste_message += f"\n- {app}"
         paste_message += (
