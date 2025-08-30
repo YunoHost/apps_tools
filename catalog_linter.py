@@ -58,7 +58,7 @@ def check_app(
     if wishlist_matches:
         yield f"app seems to be listed in wishlist: {wishlist_matches}", True
 
-    ignored_graveyard_entries = ["mailman", "invoiceninja"]
+    ignored_graveyard_entries = ["mailman", "invoiceninja", "civicrm_drupal", "drupal"]
     graveyard_matches = [
         grave
         for grave in get_graveyard()
