@@ -61,7 +61,12 @@ def check_app(
     # validate that the app is not (anymore?) in the wishlist
     # we use fuzzy matching because the id in catalog may not be the same exact id as in the wishlist
     # some entries are ignore-hard-coded, because e.g. radarr an readarr are really different apps...
-    ignored_graveyard_entries = ["mailman", "invoiceninja", "civicrm_drupal7", "drupal7"]
+    ignored_graveyard_entries = [
+        "mailman",
+        "invoiceninja",
+        "civicrm_drupal7",
+        "drupal7",
+    ]
     graveyard_matches = [
         grave
         for grave in get_graveyard()
