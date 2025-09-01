@@ -12,7 +12,9 @@ def cleanup():
     if os.path.exists("scripts/_common.sh"):
         common_content = open("scripts/_common.sh").read()
         for techno in ["nodejs", "ruby", "go", "composer"]:
-            matches = re.findall(f"\n *{techno}_version=['\"]?([0-9\\.]+)['\"]?", common_content.lower())
+            matches = re.findall(
+                f"\n *{techno}_version=['\"]?([0-9\\.]+)['\"]?", common_content.lower()
+            )
             if not matches:
                 continue
             if len(matches) > 1:
