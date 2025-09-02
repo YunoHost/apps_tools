@@ -84,6 +84,8 @@ def cleanup():
         for remove in removememaybes:
             content = content.replace(remove, r"#REMOVEME? " + remove)
 
+        content = re.sub(r'(ynh_script_progression\s*\S*"(Install|Updat|Upgrad|Reinstall|Remov)\S* (node|ruby|go)\S*\.\.\.")', r'#REMOVEME? \1', content, flags=re.IGNORECASE)
+
         open(script, "w").write(content)
 
     if os.path.exists("scripts/_common.sh"):
