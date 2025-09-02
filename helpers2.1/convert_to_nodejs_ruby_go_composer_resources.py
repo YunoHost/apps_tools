@@ -86,6 +86,30 @@ def cleanup():
 
         open(script, "w").write(content)
 
+
+    if os.path.exists("scripts/_common.sh"):
+        _common_sh_content = open("scripts/_common.sh").read().strip().split("\n")
+        common_is_empty = not any(l for l in _common_sh_content if l.strip() and not l.strip().startswith("#"))
+        if common_is_empty:
+            os.system("rm scripts/_common.sh")
+            for s in [
+                "install",
+                "remove",
+                "upgrade",
+                "backup",
+                "restore",
+                "change_url",
+                "config",
+            ]:
+                script = f"scripts/{s}"
+
+                if not os.path.exists(script):
+                    continue
+
+                os.system(r'sed "s@source.*_common.sh@@g" -i ' + script)
+                os.system(r'sed "s@# Keep this path for calling .*@@g" -i ' + script)
+
+
     if techno_versions:
         raw_manifest = open("manifest.toml", "r").read()
         raw_manifest = re.sub(
