@@ -20,13 +20,13 @@ import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 from git import Repo
 
-import appslib.logging_sender  # pylint: disable=import-error
-from appslib.utils import (
+from .appslib import logging_sender  # pylint: disable=import-error
+from .appslib.utils import (
     get_antifeatures,  # pylint: disable=import-error
     get_catalog,
     get_categories,
 )
-import appslib.get_apps_repo as get_apps_repo
+from .appslib import get_apps_repo
 
 now = time.time()
 
@@ -281,7 +281,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    appslib.logging_sender.enable()
+    logging_sender.enable()
 
     apps_dir = get_apps_repo.from_args(args)
     cache_path = get_apps_repo.cache_path(args)

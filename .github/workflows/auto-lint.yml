@@ -1,0 +1,42 @@
+name: Run Python and Bash linting
+
+on:
+  pull_request:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  python-lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.11
+
+    - name: Install dependencies for mypy
+      run: |
+        pip install -r requirements.txt
+        pip install types-toml
+
+    - name: Install mypy
+      run: pip install mypy
+
+    - name: Run Mypy
+      continue-on-error: true  # Flag as warning(?) instead of error until typing is fixed
+      run: |
+        mypy --install-types --non-interactive --strict .
+
+  bash-lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Run ShellCheck
+      uses: ludeeus/action-shellcheck@master
+      env:
+        SHELLCHECK_OPTS: -x
+      with:
+        additional_files: recipes

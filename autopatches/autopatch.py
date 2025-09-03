@@ -19,11 +19,11 @@ from git import Repo, Head, Actor
 # add apps/tools to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from app_caches import AppDir
-from appslib.utils import (  # noqa: E402 pylint: disable=import-error,wrong-import-position
+from ..app_caches import AppDir
+from ..appslib.utils import (  # noqa: E402 pylint: disable=import-error,wrong-import-position
     get_catalog,
 )
-import appslib.get_apps_repo as get_apps_repo
+from ..appslib import get_apps_repo
 
 TOOLS_DIR = Path(__file__).resolve().parent.parent
 
