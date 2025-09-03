@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 
 
-class ImageCheck():
+class ImageCheck:
     def __init__(self, imgpath: Path) -> None:
         self.imgpath = imgpath
         self.image = Image.open(imgpath)
@@ -33,16 +33,22 @@ class ImageCheck():
         format = self.image.format.lower()
         accepted_formats = ["png", "jpeg", "webp"]
         if format not in accepted_formats:
-            self.fails.append(f"Image should be one of {', '.join(accepted_formats)} but is {format}")
+            self.fails.append(
+                f"Image should be one of {', '.join(accepted_formats)} but is {format}"
+            )
 
     def check_dimensions(self) -> None:
         dim_min, dim_max = 96, 300
-        dimensions_range = range(dim_min, dim_max+1)
+        dimensions_range = range(dim_min, dim_max + 1)
         w, h = self.image.width, self.image.height
         if w not in dimensions_range:
-            self.fails.append(f"Width should be within this range of resolution [{dim_min}, {dim_max}] but is {w}")
+            self.fails.append(
+                f"Width should be within this range of resolution [{dim_min}, {dim_max}] but is {w}"
+            )
         if h not in dimensions_range:
-            self.fails.append(f"Height should be within this range of resolution [{dim_min}, {dim_max}] but is {h}")
+            self.fails.append(
+                f"Height should be within this range of resolution [{dim_min}, {dim_max}] but is {h}"
+            )
 
     def check_ratio(self) -> None:
         w, h = self.image.width, self.image.height
@@ -53,7 +59,9 @@ class ImageCheck():
         filesize = self.imgpath.stat().st_size
         max_size = 80_000
         if filesize > max_size:
-            self.fails.append(f"Filesize should be <={max_size/1000}kB but is {filesize/1000}kB")
+            self.fails.append(
+                f"Filesize should be <={max_size/1000}kB but is {filesize/1000}kB"
+            )
 
     def check_compressed(self) -> None:
         pass
@@ -72,6 +80,7 @@ def main() -> None:
 
     if not total_result:
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
