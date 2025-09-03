@@ -39,8 +39,10 @@ class ImageCheck():
         dim_min, dim_max = 96, 300
         dimensions_range = range(dim_min, dim_max+1)
         w, h = self.image.width, self.image.height
-        if w not in dimensions_range or h not in dimensions_range:
-            self.fails.append(f"Dimensions should be in [{dim_min}, {dim_max}] but are {w}×{h}")
+        if w not in dimensions_range:
+            self.fails.append(f"Width should be within this range of resolution [{dim_min}, {dim_max}] but is {w}")
+        if h not in dimensions_range:
+            self.fails.append(f"Height should be within this range of resolution [{dim_min}, {dim_max}] but is {h}")
 
     def check_ratio(self) -> None:
         w, h = self.image.width, self.image.height
