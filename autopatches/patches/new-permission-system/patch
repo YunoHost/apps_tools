@@ -2,14 +2,12 @@
 
 pushd scripts/ || true
 
-if grep -q 'ynh_legacy_permissions' upgrade || grep -q 'ynh_permission_' install
-then
+if grep -q 'ynh_legacy_permissions' upgrade || grep -q 'ynh_permission_' install; then
     # App already using the new permission system - not patching anything
     exit 0
 fi
 
-if ! grep -q "protected_\|skipped_" install
-then
+if ! grep -q "protected_\|skipped_" install; then
     # App doesn't has any (un)protected / skipped setting ?
     # Probably not a webapp or permission ain't relevant for it ?
     exit 0
@@ -52,7 +50,6 @@ for SCRIPT in remove upgrade backup restore change_url; do
     perl -p0e 's@.*ynh_script_progression.*SSOwat.*@@g' -i $SCRIPT
     perl -p0e 's@#=*\s#.*SETUP SSOWAT.*\s#=*\s@@g' -i $SCRIPT
 done
-
 
 perl -p0e 's@.*domain_regex.*@@g' -i install
 perl -p0e 's@.*# If app is public.*@@g' -i install
