@@ -13,8 +13,8 @@ import tqdm
 from git import Repo
 from git.repo.fun import is_git_dir
 
-from .appslib.utils import get_catalog
-from .appslib import get_apps_repo
+from appslib.utils import get_catalog
+import appslib.get_apps_repo as get_apps_repo
 
 
 class AppDir:

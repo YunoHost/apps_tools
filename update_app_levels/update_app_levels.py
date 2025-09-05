@@ -21,7 +21,7 @@ from git import Repo
 # add apps/tools to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from ..appslib import get_apps_repo
+from appslib import get_apps_repo
 
 APPS_REPO = "YunoHost/apps"
 

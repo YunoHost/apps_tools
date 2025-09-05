@@ -8,7 +8,7 @@ import asyncio
 import tempfile
 import requests
 
-from .make_readme import generate_READMEs
+from make_readme import generate_READMEs
 from pathlib import Path
 
 TOOLS_DIR = Path(__file__).resolve().parent.parent

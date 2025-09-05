@@ -8,7 +8,7 @@ from git import Repo, Commit
 from pathlib import Path
 import logging
 from typing import Callable
-from .appslib import get_apps_repo
+import appslib.get_apps_repo as get_apps_repo
 
 
 def git_bisect(repo: Repo, is_newer: Callable[[Commit], bool]) -> Commit | None:

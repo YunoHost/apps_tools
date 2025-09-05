@@ -8,8 +8,8 @@ from difflib import SequenceMatcher
 from typing import Any, Dict, Generator, List, Tuple
 
 import jsonschema
-from .appslib import get_apps_repo
-from .appslib.utils import (
+import appslib.get_apps_repo as get_apps_repo
+from appslib.utils import (
     get_antifeatures,  # pylint: disable=import-error
     get_catalog,
     get_categories,

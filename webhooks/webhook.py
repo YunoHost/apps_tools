@@ -20,8 +20,8 @@ from sanic import HTTPResponse, Request, Sanic, response
 # add apps/tools to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from ..appslib import get_apps_repo
-from ..readme_generator.make_readme import generate_READMEs
+from appslib import get_apps_repo
+from readme_generator.make_readme import generate_READMEs
 
 TOOLS_DIR = Path(__file__).resolve().parent.parent
 
