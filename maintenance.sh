@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}")"  &> /dev/null && pwd)
 
 update_venv() {
     if [ ! -d "venv" ]; then
         python3 -m venv venv
     fi
-    venv/bin/pip install -r requirements.txt >/dev/null
+    venv/bin/pip install -r requirements.txt > /dev/null
 }
 
 update_apps_repo() {
@@ -25,7 +25,7 @@ update_apps_cache() {
 git_pull_and_restart_services() {
     commit="$(git rev-parse HEAD)"
 
-    if ! git pull &>/dev/null; then
+    if ! git pull &> /dev/null; then
         sendxmpppy "[apps-tools] Couldn't pull, maybe local changes are present?"
         exit 1
     fi

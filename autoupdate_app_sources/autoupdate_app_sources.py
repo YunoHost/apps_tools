@@ -358,9 +358,9 @@ class AppAutoUpdater:
     def tag_to_int_tuple(tag: str) -> tuple[int, ...]:
         tag = tag.lstrip("v").replace("-", ".").rstrip(".")
         int_tuple = tag.split(".")
-        assert all(
-            i.isdigit() for i in int_tuple
-        ), f"Cant convert {tag} to int tuple :/"
+        assert all(i.isdigit() for i in int_tuple), (
+            f"Cant convert {tag} to int tuple :/"
+        )
         return tuple(int(i) for i in int_tuple)
 
     @staticmethod
@@ -468,9 +468,9 @@ class AppAutoUpdater:
 
         api: Union[GithubAPI, GitlabAPI, GiteaForgejoAPI, DownloadPageAPI]
         if remote_type == "github":
-            assert upstream and upstream.startswith(
-                "https://github.com/"
-            ), f"When using strategy {strategy}, having a defined upstream code repo on github.com is required"
+            assert upstream and upstream.startswith("https://github.com/"), (
+                f"When using strategy {strategy}, having a defined upstream code repo on github.com is required"
+            )
             api = GithubAPI(upstream, auth=get_github()[0])
         if remote_type == "gitlab":
             api = GitlabAPI(upstream)
@@ -831,7 +831,7 @@ def main() -> None:
         manifest_url = (
             f"https://github.com/YunoHost-Apps/{app}_ynh/blob/testing/manifest.toml"
         )
-        paste_message += f"\n{'='*40}\n{app}\n{'-'*40}\n{logs[0]}\n{logs[1]}\n\nLink to manifest: {manifest_url}\n\n"
+        paste_message += f"\n{'=' * 40}\n{app}\n{'-' * 40}\n{logs[0]}\n{logs[1]}\n\nLink to manifest: {manifest_url}\n\n"
 
     if args.paste:
         paste_url = paste_on_haste(paste_message)

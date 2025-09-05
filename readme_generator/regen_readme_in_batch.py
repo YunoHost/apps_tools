@@ -50,7 +50,6 @@ async def git(cmd, in_folder=None):
 
 
 async def regen_readme(repository, branch):
-
     print()
     print(f"{repository} -> branch '{branch}'")
     print("=" * len(f"{repository} -> branch '{branch}'"))

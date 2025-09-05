@@ -2,8 +2,7 @@
 
 cd scripts/ || true
 
-if [ ! -e change_url ] || grep -q 'ynh_abort_if_errors' change_url
-then
+if [ ! -e change_url ] || grep -q 'ynh_abort_if_errors' change_url; then
     # The app doesn't has any change url script or already has ynh_abort_if_error
     exit 0
 fi
