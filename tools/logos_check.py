@@ -60,7 +60,7 @@ class ImageCheck:
         max_size = 80_000
         if filesize > max_size:
             self.fails.append(
-                f"Filesize should be <={max_size/1000}kB but is {filesize/1000}kB"
+                f"Filesize should be <={max_size / 1000}kB but is {filesize / 1000}kB"
             )
 
     def check_compressed(self) -> None:

@@ -21,9 +21,9 @@ class GithubAPI:
     def __init__(self, upstream: str, auth: Optional[tuple[str, str]] = None):
         self.upstream = upstream.strip("/")
         self.upstream_repo = upstream.replace("https://github.com/", "").strip("/")
-        assert (
-            len(self.upstream_repo.split("/")) == 2
-        ), f"'{upstream}' doesn't seem to be a github repository ?"
+        assert len(self.upstream_repo.split("/")) == 2, (
+            f"'{upstream}' doesn't seem to be a github repository ?"
+        )
         self.auth = auth
 
     def internal_api(self, uri: str) -> Any:

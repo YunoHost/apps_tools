@@ -6,7 +6,6 @@ import re
 
 
 def cleanup():
-
     comment_blocks_to_cleanup = [
         r"#=+\s*\n# GENERIC START\S*\s*\n#=+\s*\n# IMPORT GENERIC HELPERS\n#=+\s*\n",
         r"#=+\s*\n# EXPERIMENTAL HELPERS\s*\n#=+\s*\n",
@@ -355,7 +354,6 @@ def cleanup():
         "change_url",
         "config",
     ]:
-
         script = f"scripts/{s}"
 
         if not os.path.exists(script):
@@ -383,7 +381,6 @@ def cleanup():
 
     # Specific PHP FPM conf patch
     if os.path.exists("conf/extra_php-fpm.conf"):
-
         content = open("conf/extra_php-fpm.conf").read()
 
         pattern_upload_max_filesize = r"\nphp_\S*\[upload_max_filesize\] = (\S*)"

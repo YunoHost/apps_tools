@@ -6,7 +6,6 @@ import re
 
 
 def cleanup():
-
     techno_versions = {}
 
     if os.path.exists("scripts/_common.sh"):
@@ -73,7 +72,6 @@ def cleanup():
         "change_url",
         "config",
     ]:
-
         script = f"scripts/{s}"
 
         if not os.path.exists(script):
