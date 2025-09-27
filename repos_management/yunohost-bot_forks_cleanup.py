@@ -4,7 +4,6 @@ from pathlib import Path
 
 # Obtained with `pip install PyGithub`, better within a venv
 from github import Github
-from github.Workflow import Workflow
 
 TOOLS_DIR = Path(__file__).resolve().parent.parent
 
