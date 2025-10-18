@@ -23,7 +23,6 @@ def create_missing_labels(args):
 
     o = g.get_organization("yunohost-apps")
     for repo in o.get_repos():
-
         if not repo.name.endswith("_ynh") or repo.name.startswith("yunohost_"):
             continue
 

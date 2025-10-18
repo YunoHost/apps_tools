@@ -18,7 +18,6 @@ def git(cmd: list[str]) -> str:
 
 
 def _time_points_until_today() -> Generator[datetime, None, None]:
-
     year = 2022
     month = 1
     day = 1
@@ -43,9 +42,7 @@ def _time_points_until_today() -> Generator[datetime, None, None]:
 def get_history(
     N: int,
 ) -> Generator[tuple[datetime, dict[str, Any]], None, None]:
-
-    for t in list(_time_points_until_today())[(-1 * N):]:
-
+    for t in list(_time_points_until_today())[(-1 * N) :]:
         # Fetch apps list content at this date
         commit = git(
             [
@@ -75,7 +72,11 @@ history = list(get_history(N))
 
 current_catalog = tomllib.loads(open(str(CATALOG_REPO_CLONE) + "/apps.toml").read())
 
-currently_broken_apps = [app for app, infos in current_catalog.items() if infos["state"] == "working" and infos.get("level") == 0]
+currently_broken_apps = [
+    app
+    for app, infos in current_catalog.items()
+    if infos["state"] == "working" and infos.get("level") == 0
+]
 
 app_last_time_non_broken = []
 
@@ -91,11 +92,20 @@ for app in currently_broken_apps:
             previous_non_broken_level = level
             break
 
-    app_last_time_non_broken.append((last_time_non_broken, app, previous_non_broken_level))
+    app_last_time_non_broken.append(
+        (last_time_non_broken, app, previous_non_broken_level)
+    )
 
-sorted_entries = sorted(app_last_time_non_broken, key=lambda entry: entry[0] or datetime(1970, 1, 1), reverse=True)
+sorted_entries = sorted(
+    app_last_time_non_broken,
+    key=lambda entry: entry[0] or datetime(1970, 1, 1),
+    reverse=True,
+)
 for last_time_non_broken, app, previous_non_broken_level in sorted_entries:
     if previous_non_broken_level:
-        print(f"{app} was level {previous_non_broken_level} back to " + last_time_non_broken.date().strftime("%b %d %Y"))
+        print(
+            f"{app} was level {previous_non_broken_level} back to "
+            + last_time_non_broken.date().strftime("%b %d %Y")
+        )
     else:
         print(f"{app} : can't find last time it was not broken")

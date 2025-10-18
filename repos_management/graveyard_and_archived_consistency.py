@@ -31,7 +31,6 @@ def analyze_repos(args):
 
     o = g.get_organization("yunohost-apps")
     for repo in o.get_repos():
-
         if not repo.name.endswith("_ynh") or repo.name.startswith("yunohost_"):
             continue
 
@@ -39,11 +38,16 @@ def analyze_repos(args):
 
         if app in catalog or app in wishlist:
             infos_in_catalog = catalog.get(app, {})
-            deprecated = "antifeatures" in infos_in_catalog and "deprecated-software" in infos_in_catalog["antifeatures"]
+            deprecated = (
+                "antifeatures" in infos_in_catalog
+                and "deprecated-software" in infos_in_catalog["antifeatures"]
+            )
             if deprecated and not repo.archived:
                 deprecated_and_should_be_archived.add((app, repo.html_url, repo))
             elif repo.archived and app in catalog and not deprecated:
-                archived_but_not_deprecated_nor_in_graveyard.add((app, repo.html_url, repo))
+                archived_but_not_deprecated_nor_in_graveyard.add(
+                    (app, repo.html_url, repo)
+                )
 
         elif app in graveyard:
             if not repo.archived:
@@ -53,25 +57,33 @@ def analyze_repos(args):
             not_referenced.add((app, repo.html_url, repo))
 
     print("\n\n\n")
-    print(f"{len(graveyard_should_be_archived)} apps in the graveyard but their repo are not archived")
+    print(
+        f"{len(graveyard_should_be_archived)} apps in the graveyard but their repo are not archived"
+    )
     print("-" * 80)
     for app, url, _ in sorted(graveyard_should_be_archived):
         print(f"{app:<22} : {url}")
 
     print("\n\n\n")
-    print(f"{len(deprecated_and_should_be_archived)} apps that are marked as deprecated-software in apps.toml, and their repo should be archived ?")
+    print(
+        f"{len(deprecated_and_should_be_archived)} apps that are marked as deprecated-software in apps.toml, and their repo should be archived ?"
+    )
     print("-" * 80)
     for app, url, _ in sorted(deprecated_and_should_be_archived):
         print(f"{app:<22} : {url}")
 
     print("\n\n\n")
-    print(f"{len(archived_but_not_deprecated_nor_in_graveyard)} apps have their repo archived, but are not flagged as depreacted in apps.toml ?")
+    print(
+        f"{len(archived_but_not_deprecated_nor_in_graveyard)} apps have their repo archived, but are not flagged as depreacted in apps.toml ?"
+    )
     print("-" * 80)
     for app, url, _ in sorted(archived_but_not_deprecated_nor_in_graveyard):
         print(f"{app:<22} : {url}")
 
     print("\n\n\n")
-    print(f"{len(not_referenced)} repos are neither referenced in apps.toml, wishlist.toml, graveyard.toml, and are not archived either ?")
+    print(
+        f"{len(not_referenced)} repos are neither referenced in apps.toml, wishlist.toml, graveyard.toml, and are not archived either ?"
+    )
     print("-" * 80)
     for app, url, repo in sorted(not_referenced, key=lambda repo: repo[2].pushed_at):
         last_push_days_ago = (datetime.now(timezone.utc) - repo.pushed_at).days
@@ -82,7 +94,10 @@ def analyze_repos(args):
             print(f"Archiving {url} ...")
             repo.edit(archived=True)
 
-    if args.fix_archived_but_not_deprecated and archived_but_not_deprecated_nor_in_graveyard:
+    if (
+        args.fix_archived_but_not_deprecated
+        and archived_but_not_deprecated_nor_in_graveyard
+    ):
         print(f"Patching {apps_repo_dir / 'apps.toml'} ...")
         for app, _, _ in sorted(archived_but_not_deprecated_nor_in_graveyard):
             if app not in catalog:
