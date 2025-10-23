@@ -192,6 +192,16 @@ def on_pr_comment(request: Request, pr_infos: dict) -> HTTPResponse:
                 pass
         return reject_wishlist(request, pr_infos, reason)
 
+    INVITE_COMMANDS = ["!invite", "!allezviensonestbien"]
+    if any(trigger.lower() in body for trigger in INVITE_COMMANDS):
+        user=""
+        for command in INVITE_COMMANDS:
+            try:
+                invitee = re.search(f"{command} @(\S+)", fullbody).group(1).rstrip()
+            except:
+                pass
+        return invite(request, pr_infos, invitee)
+
     return response.empty()
 
 
@@ -238,7 +248,7 @@ def add_changelog(request: Request, pr_infos: dict, changelog=None) -> HTTPRespo
     branch = pr_infos["head"]["ref"]
 
     if not repository.startswith("YunoHost-Apps/"):
-        response.empty()
+        return response.empty()
 
     logging.info(f"Will add changelog on {repository} branch {branch}...")
     with tempfile.TemporaryDirectory() as folder_str:
@@ -332,6 +342,60 @@ def reject_wishlist(request: Request, pr_infos: dict, reason=None) -> HTTPRespon
                 )
 
         return response.text("ok")
+
+def invite(request: Request, pr_infos: dict, invitee=None) -> HTTPResponse:
+    data = request.json
+    repository = data["repository"]["full_name"]
+    branch = pr_infos["head"]["ref"]
+    user = data["user"]["login"]
+
+    if repository != "YunoHost/apps" or user is None:
+        return response.empty()
+
+    can_invite = False
+    if data["author_association"] = "OWNER":
+        can_invite = True
+        logging.info(
+            f"User {user} is an owner of the YunoHost org and can thus invite people to the YunoHost-Apps org"
+        )
+    else:
+        with requests.Session() as s:
+            s.headers.update({"Authorization": f"token {github_token()}"})
+            r = s.get(
+                f"https://api.github.com/orgs/YunoHost/teams/apps/memberships/{user}"
+            )
+            if r.status_code = 200:
+                can_invite = True
+                logging.info(
+                    f"User {user} is in the Apps team and can invite people to the YunoHost-Apps org"
+                )
+            else:
+                logging.info(
+                    f"Checking for {user} belonging in the Apps team failed with code {r.status_code}"
+                )
+
+    if can_invite:
+        with requests.Session() as s:
+            s.headers.update({"Authorization": f"token {github_token()}"})
+            r = s.post(
+                f"https://api.github.com/orgs/YunoHost-Apps/invitations",
+                json={"new_invitation": f"{invitee}"}
+            )
+            if r.status_code = 201:
+                logging.info(
+                    f"User {invitee} has been invited the YunoHost-Apps org"
+                )
+                r = s.post(
+                    data["issue"]["comments_url"],
+                    json={"body": f"@{invitee}, you have just been invited to the YunoHost-Apps organization.\nAfter accepting it, we suggest you to transfer your repository in the org so that you can take advantage of the automated CI tests and other packagers' help:\n1. open a PR from the testing branch to the main one\n2. add your commits\n3. trigger the CI with `!testme` in a comment."}
+                )
+            else:
+                logging.info(
+                    f"Inviting {invitee} has failed with code {r.status_code}"
+                )
+            return response.empty(status=r.status_code)
+
+    return response.empty()
 
 
 def generate_and_commit_readmes(repo: Repo) -> bool:
