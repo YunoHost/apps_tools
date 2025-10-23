@@ -51,6 +51,10 @@ def github_token() -> str:
     return (TOOLS_DIR / ".github_token").open("r", encoding="utf-8").read().strip()
 
 @cache
+def github_token_membership() -> str:
+    return (TOOLS_DIR / ".github_token_membership").open("r", encoding="utf-8").read().strip()
+
+@cache
 def github_token_invitations() -> str:
     return (TOOLS_DIR / ".github_token_invitations").open("r", encoding="utf-8").read().strip()
 
@@ -363,7 +367,7 @@ def invite(request: Request, pr_infos: dict, invitee=None) -> HTTPResponse:
         )
     else:
         with requests.Session() as s:
-            s.headers.update({"Authorization": f"token {github_token_invitations()}"})
+            s.headers.update({"Authorization": f"token {github_token_membership()}"})
             r = s.get(
                 f"https://api.github.com/orgs/YunoHost/teams/apps/memberships/{user}"
             )
