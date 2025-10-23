@@ -353,7 +353,7 @@ def invite(request: Request, pr_infos: dict, invitee=None) -> HTTPResponse:
         return response.empty()
 
     can_invite = False
-    if data["author_association"] == "OWNER":
+    if data["comment"]["author_association"] == "OWNER":
         can_invite = True
         logging.info(
             f"User {user} is an owner of the YunoHost org and can thus invite people to the YunoHost-Apps org"
