@@ -240,6 +240,10 @@ class AppAutoUpdater:
 
             if msg:
                 commit_msg += f"\n- `{source}` v{version}: {msg}"
+                self.update_instructions = app / "PACKAGE_UPDATE.md"
+                if self.update_instructions.exists():
+                    with open(self.update_instructions) as ui_file:
+                        commit_msg += f"\n{ui_file.read()}"
 
             self.repo.manifest_raw = self.replace_version_and_asset_in_manifest(
                 self.repo.manifest_raw,
