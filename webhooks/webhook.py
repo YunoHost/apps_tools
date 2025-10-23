@@ -50,6 +50,9 @@ def github_login() -> str:
 def github_token() -> str:
     return (TOOLS_DIR / ".github_token").open("r", encoding="utf-8").read().strip()
 
+@cache
+def github_token_invitations() -> str:
+    return (TOOLS_DIR / ".github_token_invitations").open("r", encoding="utf-8").read().strip()
 
 @APP.route("/github", methods=["GET"])
 async def github_get(request: Request) -> HTTPResponse:
@@ -360,7 +363,7 @@ def invite(request: Request, pr_infos: dict, invitee=None) -> HTTPResponse:
         )
     else:
         with requests.Session() as s:
-            s.headers.update({"Authorization": f"token {github_token()}"})
+            s.headers.update({"Authorization": f"token {github_token_invitations()}"})
             r = s.get(
                 f"https://api.github.com/orgs/YunoHost/teams/apps/memberships/{user}"
             )
@@ -376,7 +379,7 @@ def invite(request: Request, pr_infos: dict, invitee=None) -> HTTPResponse:
 
     if can_invite:
         with requests.Session() as s:
-            s.headers.update({"Authorization": f"token {github_token()}"})
+            s.headers.update({"Authorization": f"token {github_token_invitations()}"})
             r = s.post(
                 f"https://api.github.com/orgs/YunoHost-Apps/invitations",
                 json={"new_invitation": f"{invitee}"}
