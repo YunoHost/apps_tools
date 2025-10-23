@@ -364,7 +364,7 @@ def invite(request: Request, pr_infos: dict, invitee=None) -> HTTPResponse:
             r = s.get(
                 f"https://api.github.com/orgs/YunoHost/teams/apps/memberships/{user}"
             )
-            if r.status_code = 200:
+            if r.status_code == 200:
                 can_invite = True
                 logging.info(
                     f"User {user} is in the Apps team and can invite people to the YunoHost-Apps org"
@@ -381,7 +381,7 @@ def invite(request: Request, pr_infos: dict, invitee=None) -> HTTPResponse:
                 f"https://api.github.com/orgs/YunoHost-Apps/invitations",
                 json={"new_invitation": f"{invitee}"}
             )
-            if r.status_code = 201:
+            if r.status_code == 201:
                 logging.info(
                     f"User {invitee} has been invited the YunoHost-Apps org"
                 )
