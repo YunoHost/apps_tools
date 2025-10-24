@@ -383,22 +383,31 @@ def invite(request: Request, pr_infos: dict, invitee=None) -> HTTPResponse:
 
     if can_invite:
         with requests.Session() as s:
+            invitee_id = s.get(f"https://api.github.com/users/{invitee}").json()["id"]
+            s.headers.update({
+                "Authorization": f"token {github_token_invitations()}",
+                "X-GitHub-Api-Version": "2022-11-28",
+                "Accept": "application/vnd.github+json"
+            })
             s.headers.update({"Authorization": f"token {github_token_invitations()}"})
             r = s.post(
                 f"https://api.github.com/orgs/YunoHost-Apps/invitations",
-                json={"new_invitation": f"{invitee}"}
+                json={"invitee_id": invitee_id}
             )
             if r.status_code == 201:
                 logging.info(
-                    f"User {invitee} has been invited the YunoHost-Apps org"
+                    f"User {invitee} has been invited to the YunoHost-Apps org"
                 )
+                s.headers.update({
+                    "Authorization": f"token {github_token()}"
+                })
                 r = s.post(
                     data["issue"]["comments_url"],
                     json={"body": f"@{invitee}, you have just been invited to the YunoHost-Apps organization.\nAfter accepting it, we suggest you to transfer your repository in the org so that you can take advantage of the automated CI tests and other packagers' help:\n1. open a PR from the testing branch to the main one\n2. add your commits\n3. trigger the CI with `!testme` in a comment."}
                 )
             else:
                 logging.info(
-                    f"Inviting {invitee} has failed with code {r.status_code}"
+                    f"Inviting {invitee} (id: {invitee_id}) has failed with code {r.status_code}"
                 )
             return response.empty(status=r.status_code)
 
