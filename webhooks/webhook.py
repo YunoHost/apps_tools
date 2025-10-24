@@ -403,7 +403,7 @@ def invite(request: Request, pr_infos: dict, invitee=None) -> HTTPResponse:
                 })
                 r = s.post(
                     data["issue"]["comments_url"],
-                    json={"body": f"@{invitee}, you have just been invited to the YunoHost-Apps organization.\nAfter accepting it, we suggest you to transfer your repository in the org so that you can take advantage of the automated CI tests and other packagers' help:\n1. open a PR from the testing branch to the main one\n2. add your commits\n3. trigger the CI with `!testme` in a comment."}
+                    json={"body": f"@{invitee}, you have just been invited to the YunoHost-Apps organization.\nWe suggest that you transfer your repository in the org so that you can take advantage of the automated CI tests and other packagers' help:\n  1. check your notifications and accept the invitation.\n  2. transfer your repository to the YunoHost-Apps organization.\n  3. open a PR from the testing branch to the main branch of your repository\n  4. add your commits and open a pull request.\n  5. trigger the CI with `!testme` in a comment in that PR.\n\nYou can find more information on packaging in our [documentation](https://doc.yunohost.org/en/packaging/)"}
                 )
             else:
                 logging.info(
