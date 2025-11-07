@@ -356,7 +356,7 @@ def invite(request: Request, pr_infos: dict, invitee=None) -> HTTPResponse:
     branch = pr_infos["head"]["ref"]
     user = data["comment"]["user"]["login"]
 
-    if repository != "YunoHost/apps" or user is None:
+    if (repository != "YunoHost/apps" and not repository.startswith("YunoHost-Apps/")) or user is None:
         return response.empty()
 
     can_invite = False
