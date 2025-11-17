@@ -204,7 +204,7 @@ def on_pr_comment(request: Request, pr_infos: dict) -> HTTPResponse:
         user=""
         for command in INVITE_COMMANDS:
             try:
-                invitee = re.search(f"{command} @(\S+)", fullbody).group(1).rstrip()
+                invitee = re.search(f"{command} @?(\S+)", fullbody).group(1).rstrip()
             except:
                 pass
         return invite(request, pr_infos, invitee)
