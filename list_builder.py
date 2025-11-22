@@ -160,7 +160,6 @@ def write_catalog_doc(base_catalog, target_dir: Path) -> None:
     result_dict_doc = {
         k: infos_for_doc_catalog(v)
         for k, v in base_catalog.items()
-        if v["state"] == "working"
     }
     full_catalog = {"apps": result_dict_doc, "categories": categories_list()}
 
