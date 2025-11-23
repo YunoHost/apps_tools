@@ -311,7 +311,11 @@ def reject_wishlist(request: Request, pr_infos: dict, reason=None) -> HTTPRespon
         if r.status_code == 200:
             can_reject = True
             logging.info(
-                f"User {user} is in the Apps team and can thus reject apps from the wishlist"
+                f"User {user} is in the Apps team"
+            )
+        elif r.status_code == 404:
+            logging.info(
+                f"User {user} is not the Apps team"
             )
         else:
             logging.info(
@@ -326,7 +330,11 @@ def reject_wishlist(request: Request, pr_infos: dict, reason=None) -> HTTPRespon
         if r.status_code == 200:
             can_reject = True
             logging.info(
-                f"User {user} is a Regular Contributor and can thus reject apps from the wishlist"
+                f"User {user} is a Regular Contributor"
+            )
+        elif r.status_code == 404:
+            logging.info(
+                f"User {user} is not a Regular Contributor"
             )
         else:
             logging.info(
@@ -334,6 +342,16 @@ def reject_wishlist(request: Request, pr_infos: dict, reason=None) -> HTTPRespon
             )
 
     if not can_reject:
+        logging.info(
+            f"User {user} is not allowed to reject apps from the wishlist"
+        )
+        with requests.Session() as s:
+            comment_id = data["comment"]["id"]
+            s.headers.update({"Authorization": f"token {github_token()}"})
+            r = s.post(
+                f"https://api.github.com/repos/{repository}/issues/comments/{comment_id}/reactions",
+                json='{"content": "-1"}'
+            )
         return response.empty()
 
     logging.info(
