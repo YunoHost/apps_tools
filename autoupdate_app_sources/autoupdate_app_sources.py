@@ -467,15 +467,19 @@ class AppAutoUpdater:
         _, remote_type, revision_type = strategy.split("_")
 
         api: Union[GithubAPI, GitlabAPI, GiteaForgejoAPI, DownloadPageAPI]
-        if remote_type == "github":
-            assert upstream and upstream.startswith("https://github.com/"), (
-                f"When using strategy {strategy}, having a defined upstream code repo on github.com is required"
-            )
-            api = GithubAPI(upstream, auth=get_github()[0])
-        if remote_type == "gitlab":
-            api = GitlabAPI(upstream)
-        if remote_type in ["gitea", "forgejo"]:
-            api = GiteaForgejoAPI(upstream)
+
+        try:
+            if remote_type == "github":
+                assert upstream and upstream.startswith("https://github.com/"), (
+                    f"When using strategy {strategy}, having a defined upstream code repo on github.com is required"
+                )
+                api = GithubAPI(upstream, auth=get_github()[0])
+            if remote_type == "gitlab":
+                api = GitlabAPI(upstream)
+            if remote_type in ["gitea", "forgejo"]:
+                api = GiteaForgejoAPI(upstream)
+        except requests.exceptions.ConnectionError as e:
+            raise AutoUpdateError(f"ConnectionError when trying to initialize {remote_type} API for upstream {upstream}:\n{e}")
 
         if revision_type == "release":
             releases: dict[str, dict[str, Any]] = {
