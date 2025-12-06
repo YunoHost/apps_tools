@@ -571,7 +571,7 @@ class AppAutoUpdater:
 
         if revision_type == "commit":
             if self.latest_commit_weekly and datetime.now().weekday() != 0:
-                logging.warning("Skipped autoupdater because we're not monday")
+                logging.warning(f"Skipping autoupdater for {self.app_id} because 'commit' strategy are only effective on mondays")
                 return None
             if asset != "tarball":
                 raise ValueError(
