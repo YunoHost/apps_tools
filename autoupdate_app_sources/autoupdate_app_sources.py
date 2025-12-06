@@ -544,7 +544,12 @@ class AppAutoUpdater:
                 raise ValueError(
                     "For the latest tag strategies, only asset = 'tarball' is supported"
                 )
-            tags = [t["name"] for t in api.tags()]
+            raw_tags = api.tags()
+            try:
+                tags = [t["name"] for t in raw_tags]
+            except TypeError as e:
+                raise Exception(f"Failed to get tag names with raw_tags: {raw_tags}. Original TypeError: {e}")
+
             if self.app_id == "snweb":
                 # Stupid ad-hoc patch for snweb which has a gazillion tags for different components in their repo
                 # and we need to get to second page to get the ones relevant for the app ...

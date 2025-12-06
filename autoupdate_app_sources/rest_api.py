@@ -83,7 +83,7 @@ class GitlabAPI:
         r = requests.get(project_url)
         r.raise_for_status()
         match = re.search(r"const url = `(.*)/api/graphql`", r.text)
-        assert match is not None
+        assert match is not None, f"No match found for forge root using project url '{project_url}'"
         return match.group(1)
 
     def find_project_id(self, project: str) -> int:
