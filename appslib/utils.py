@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import subprocess
-from typing import Any, Optional
+from typing import Any, Optional, Literal
 from functools import cache
 from pathlib import Path
 from git import Repo
@@ -66,3 +66,9 @@ def get_wishlist() -> dict[str, dict[str, str]]:
 def get_graveyard() -> dict[str, dict[str, str]]:
     wishlist_path = REPO_APPS_ROOT / "graveyard.toml"
     return toml.load(wishlist_path)
+
+
+@cache
+def get_security() -> dict[Literal['apps', 'system'], dict[str, list[dict]]]:
+    security_path = REPO_APPS_ROOT / "security.toml"
+    return toml.load(security_path)
