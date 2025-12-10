@@ -137,40 +137,6 @@ def write_catalog_v3(base_catalog, apps_path: Path, target_dir: Path) -> None:
     )
 
 
-def write_catalog_doc(base_catalog, target_dir: Path) -> None:
-    def infos_for_doc_catalog(infos):
-        level = infos.get("level")
-        if not isinstance(level, int):
-            level = -1
-        return {
-            "id": infos["id"],
-            "category": infos["category"],
-            "url": infos["git"]["url"],
-            "name": infos["manifest"]["name"],
-            "description": infos["manifest"]["description"],
-            "state": infos["state"],
-            "level": level,
-            "broken": level <= 0,
-            "good_quality": level >= 8,
-            "bad_quality": level <= 5,
-            "antifeatures": infos.get("antifeatures"),
-            "potential_alternative_to": infos.get("potential_alternative_to", []),
-        }
-
-    result_dict_doc = {
-        k: infos_for_doc_catalog(v)
-        for k, v in base_catalog.items()
-        if v["state"] == "working"
-    }
-    full_catalog = {"apps": result_dict_doc, "categories": categories_list()}
-
-    target_file = target_dir / "apps.json"
-    target_file.parent.mkdir(parents=True, exist_ok=True)
-    target_file.open("w", encoding="utf-8").write(
-        json.dumps(full_catalog, sort_keys=True)
-    )
-
-
 def build_app_dict(app, infos, cache_path: Path):
     # Make sure we have some cache
     this_app_cache = cache_path / app
@@ -295,7 +261,6 @@ def main() -> None:
 
     print(f"Writing the catalogs to {target_dir}...")
     write_catalog_v3(base_catalog, apps_dir, target_dir / "v3")
-    write_catalog_doc(base_catalog, target_dir / "doc_catalog")
     print("Done!")
 
 
