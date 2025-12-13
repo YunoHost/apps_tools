@@ -479,7 +479,9 @@ class AppAutoUpdater:
             if remote_type in ["gitea", "forgejo"]:
                 api = GiteaForgejoAPI(upstream)
         except requests.exceptions.ConnectionError as e:
-            raise AutoUpdateError(f"ConnectionError when trying to initialize {remote_type} API for upstream {upstream}:\n{e}")
+            raise AutoUpdateError(
+                f"ConnectionError when trying to initialize {remote_type} API for upstream {upstream}:\n{e}"
+            )
 
         if revision_type == "release":
             releases: dict[str, dict[str, Any]] = {
@@ -548,7 +550,9 @@ class AppAutoUpdater:
             try:
                 tags = [t["name"] for t in raw_tags]
             except TypeError as e:
-                raise Exception(f"Failed to get tag names with raw_tags: {raw_tags}. Original TypeError: {e}")
+                raise Exception(
+                    f"Failed to get tag names with raw_tags: {raw_tags}. Original TypeError: {e}"
+                )
 
             if self.app_id == "snweb":
                 # Stupid ad-hoc patch for snweb which has a gazillion tags for different components in their repo
@@ -571,7 +575,9 @@ class AppAutoUpdater:
 
         if revision_type == "commit":
             if self.latest_commit_weekly and datetime.now().weekday() != 0:
-                logging.warning(f"Skipping autoupdater for {self.app_id} because 'commit' strategy are only effective on mondays")
+                logging.warning(
+                    f"Skipping autoupdater for {self.app_id} because 'commit' strategy are only effective on mondays"
+                )
                 return None
             if asset != "tarball":
                 raise ValueError(
