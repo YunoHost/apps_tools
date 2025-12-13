@@ -24,6 +24,7 @@ from appslib.utils import (
     get_antifeatures,  # pylint: disable=import-error
     get_catalog,
     get_categories,
+    get_security,
 )
 import appslib.get_apps_repo as get_apps_repo
 
@@ -49,6 +50,13 @@ def antifeatures_list():
     for antifeature_id, infos in new_antifeatures.items():
         infos["id"] = antifeature_id
     return list(new_antifeatures.values())
+
+
+@cache
+def security_list():
+    security = get_security()
+    security["version"] = 1
+    return security
 
 
 @cache
@@ -127,6 +135,7 @@ def write_catalog_v3(base_catalog, apps_path: Path, target_dir: Path) -> None:
         "apps": {app: infos_for_v3(app, info) for app, info in base_catalog.items()},
         "categories": categories_list(),
         "antifeatures": antifeatures_list(),
+        "security": security_list(),
     }
 
     target_file = target_dir / "apps.json"
@@ -260,6 +269,7 @@ def main() -> None:
 
     print(f"Writing the catalogs to {target_dir}...")
     write_catalog_v3(base_catalog, apps_dir, target_dir / "v3")
+    write_security(apps_dir, target_dir / "v3")
     print("Done!")
 
 
