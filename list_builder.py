@@ -269,7 +269,6 @@ def main() -> None:
 
     print(f"Writing the catalogs to {target_dir}...")
     write_catalog_v3(base_catalog, apps_dir, target_dir / "v3")
-    write_security(apps_dir, target_dir / "v3")
     print("Done!")
 
 
