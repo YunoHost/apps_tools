@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
-python3 ../../../helpers2.1/convert_to_nodejs_ruby_go_composer_resources.py ./
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+python3 $SCRIPT_DIR/patch.py ./
 
 git add .
