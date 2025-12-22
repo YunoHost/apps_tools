@@ -610,7 +610,10 @@ class AppAutoUpdater:
     def get_old_ref(infos: dict[str, Any]) -> str:
         regex = r".*[\/-]([a-f0-9]+)\."
         if isinstance(infos["url"], str):
-            return re.match(regex, infos["url"]).group(1)
+            try:
+                return re.match(regex, infos["url"]).group(1)
+            except AttributeError as e:
+                raise Exception(f"Failed to match regex {regex} on url '{infos['url']}' ?")
         if isinstance(infos["url"], dict):
             for _, url in infos["url"]:
                 return re.match(regex, url).group(1)
