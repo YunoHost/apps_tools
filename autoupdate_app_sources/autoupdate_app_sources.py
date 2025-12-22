@@ -468,18 +468,15 @@ class AppAutoUpdater:
 
         api: Union[GithubAPI, GitlabAPI, GiteaForgejoAPI, DownloadPageAPI]
 
-        try:
-            if remote_type == "github":
-                assert upstream and upstream.startswith("https://github.com/"), (
-                    f"When using strategy {strategy}, having a defined upstream code repo on github.com is required"
-                )
-                api = GithubAPI(upstream, auth=get_github()[0])
-            if remote_type == "gitlab":
-                api = GitlabAPI(upstream)
-            if remote_type in ["gitea", "forgejo"]:
-                api = GiteaForgejoAPI(upstream)
-        except requests.exceptions.ConnectionError as e:
-            raise AutoUpdateError(f"ConnectionError when trying to initialize {remote_type} API for upstream {upstream}:\n{e}")
+        if remote_type == "github":
+            assert upstream and upstream.startswith("https://github.com/"), (
+                f"When using strategy {strategy}, having a defined upstream code repo on github.com is required"
+            )
+            api = GithubAPI(upstream, auth=get_github()[0])
+        if remote_type == "gitlab":
+            api = GitlabAPI(upstream)
+        if remote_type in ["gitea", "forgejo"]:
+            api = GiteaForgejoAPI(upstream)
 
         if revision_type == "release":
             releases: dict[str, dict[str, Any]] = {
@@ -724,6 +721,15 @@ def run_autoupdate_for_multiprocessing(data) -> tuple[str, tuple[State, str, str
     except AutoUpdateError as e:
         log_str = stdoutswitch.reset()
         return (app, (State.failure, log_str, str(e), ""))
+    except requests.exceptions.RequestException as e:
+        log_str = stdoutswitch.reset()
+        try:
+            # Wrapping this in a try/except because not 100% convinced it's the right syntax. To be removed later if that doesn't crash the whole thing
+            url = e.request.url
+        except Exception as e
+            url = f"(??? {e} ???) "
+        message = f"HTTP request failed when fetching {url} ... : {e}"
+        return (app, (State.failure, log_str, message, ""))
     except Exception:
         log_str = stdoutswitch.reset()
         import traceback
