@@ -69,6 +69,6 @@ def get_graveyard() -> dict[str, dict[str, str]]:
 
 
 @cache
-def get_security() -> dict[Literal['apps', 'system'], dict[str, list[dict]]]:
+def get_security() -> dict[Literal["apps", "system"], dict[str, list[dict]]]:
     security_path = REPO_APPS_ROOT / "security.toml"
     return toml.load(security_path)
