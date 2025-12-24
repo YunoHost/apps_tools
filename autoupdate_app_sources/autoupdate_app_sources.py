@@ -220,10 +220,9 @@ class AppAutoUpdater:
         main_version = ""
         pr_url = ""
 
-        # Default message
         pr_title = commit_msg = "Upgrade sources"
-        date = datetime.now().strftime("%y%m%d")
-        branch_name = f"ci-auto-update-sources-{date}"
+        branch_name = ""
+        string_input = ""
 
         for source, infos in self.sources.items():
             update = self.get_source_update(source, infos)
@@ -240,6 +239,7 @@ class AppAutoUpdater:
 
             if msg:
                 commit_msg += f"\n- `{source}` v{version}: {msg}"
+                string_input += f"\n{source}v{version}"
 
             self.repo.manifest_raw = self.replace_version_and_asset_in_manifest(
                 self.repo.manifest_raw,
@@ -262,6 +262,10 @@ class AppAutoUpdater:
 
         try:
             if pr:
+                if len(branch_name) == 0:
+                    # calculate branch name based on changed asset(s)/version mix to avoid same-update loop
+                    branch_name = f"ci-auto-update-sources-{hashlib.sha256(string_input.encode()).hexdigest()[:8]}"
+
                 self.repo.new_branch(branch_name)
         except github.GithubException as e:
             if e.status == 409:
