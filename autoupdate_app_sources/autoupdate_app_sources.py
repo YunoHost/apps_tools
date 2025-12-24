@@ -549,7 +549,9 @@ class AppAutoUpdater:
             try:
                 tags = [t["name"] for t in raw_tags]
             except TypeError as e:
-                raise Exception(f"Failed to get tag names with raw_tags: {raw_tags}. Original TypeError: {e}")
+                raise Exception(
+                    f"Failed to get tag names with raw_tags: {raw_tags}. Original TypeError: {e}"
+                )
 
             if self.app_id == "snweb":
                 # Stupid ad-hoc patch for snweb which has a gazillion tags for different components in their repo
@@ -572,7 +574,9 @@ class AppAutoUpdater:
 
         if revision_type == "commit":
             if self.latest_commit_weekly and datetime.now().weekday() != 0:
-                logging.warning(f"Skipping autoupdater for {self.app_id} because 'commit' strategy are only effective on mondays")
+                logging.warning(
+                    f"Skipping autoupdater for {self.app_id} because 'commit' strategy are only effective on mondays"
+                )
                 return None
             if asset != "tarball":
                 raise ValueError(
@@ -617,7 +621,9 @@ class AppAutoUpdater:
             try:
                 return re.match(regex, infos["url"]).group(1)
             except AttributeError as e:
-                raise Exception(f"Failed to match regex {regex} on url '{infos['url']}' ?")
+                raise Exception(
+                    f"Failed to match regex {regex} on url '{infos['url']}' ?"
+                )
         if isinstance(infos["url"], dict):
             for _, url in infos["url"]:
                 return re.match(regex, url).group(1)
