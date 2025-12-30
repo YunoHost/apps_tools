@@ -1,7 +1,7 @@
 """
 Checks against NIST and EUVD databases for vulnerabilities impacting Yunohost app catalog
 
-* Install dependencies: pip install requirements.txt
+* Install dependencies: pip install -r requirements.txt
 * Execution time: depends on API rate limitation, so count ~between 2 and 7 seconds per app
 * Environment variables: NIST_API_KEY (optional)
 
