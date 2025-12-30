@@ -19,7 +19,7 @@ The data in the source `security.toml` is kept in the updated version.
 7. Run the script, e.g.:
 	1. for only a few apps: `python3 update_vulnerabilities_database.py -c path/to/apps_cache -l path/to/apps -w -a discourse,nextcloud`
 	2. for all apps of the catalog: `python3 update_vulnerabilities_database.py -c path/to/apps_cache -l path/to/apps -w`
-8. With such arguments, it will create a `security.toml` in the script's folder, and a log file in the directory from where was called. That can be customized with specific arguments.
+8. With such arguments, it will create a `security.toml` in the script's folder, and a log file in the directory from where the script was called. More options are available with specific arguments.
 
 ### Arguments
 
