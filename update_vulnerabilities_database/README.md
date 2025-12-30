@@ -13,12 +13,12 @@ The data in the source `security.toml` is kept in the updated version.
 3. Install app caches (it will take 10 to 30mn downloading): `python3 app_caches.py -j8 -l path/to/apps/repo -c apps_cache/`
 	1. `path/to/apps/repo` being the path to which the apps repo is cloned.
 	2. `apps_cache` being the path where you want the cache to be installed/updated.
-4. Go to script directory (or somewhere else actually) and create a Python Virtual environment: `python3 -m venv .venv`
-5. Activate the Python virtual environment: `source .venv/bin/activate`
-6. Install script's dependencies: `pip install requests toml tomlkit tqdm GitPython`
+4. Go to script directory (or somewhere else actually) and create a Python Virtual environment: `python3 -m venv venv`
+5. Activate the Python virtual environment: `source venv/bin/activate`
+6. Install script's dependencies: `pip install requirements.txt`
 7. Run the script, e.g.:
-	1. for only a few apps: `python3 update_vulnerabilities_database.py -c path/to/apps_cache -l path/to/apps -w`
-	2. for all apps of the catalog: `python3 update_vulnerabilities_database.py -c path/to/apps_cache -l path/to/apps -w -a discourse,nextcloud`
+	1. for only a few apps: `python3 update_vulnerabilities_database.py -c path/to/apps_cache -l path/to/apps -w -a discourse,nextcloud`
+	2. for all apps of the catalog: `python3 update_vulnerabilities_database.py -c path/to/apps_cache -l path/to/apps -w`
 8. With such arguments, it will create a `security.toml` in the script's folder, and a log file in the directory from where was called. That can be customized with specific arguments.
 
 ### Arguments

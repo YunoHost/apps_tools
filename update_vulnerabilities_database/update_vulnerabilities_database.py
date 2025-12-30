@@ -1,7 +1,7 @@
 """
 Checks against NIST and EUVD databases for vulnerabilities impacting Yunohost app catalog
 
-* Install dependencies: pip install requests toml tomlkit tqdm GitPython
+* Install dependencies: pip install requirements.txt
 * Execution time: depends on API rate limitation, so count ~between 2 and 7 seconds per app
 * Environment variables: NIST_API_KEY (optional)
 
@@ -47,10 +47,6 @@ def adjust_from_date(expected_from_date: datetime, to_date: str) -> datetime:
     NIST expects ISO_8601 date with a maximum of 120 days between from_date
     and to_date
 
-    Modules:
-        from datetime import datetime, timedelta
-        import logging
-
     Args:
         expected_from_date (datetime): expected date that will be checked and changed if the gap with to_date is more than 120 days
         to_date (str)
@@ -72,13 +68,6 @@ def api_get(url: str, params: dict = {}, headers: dict = {}) -> dict | None:
     """
     API call, retries and error management
     Inspired by https://github.com/joshbressers/cve-analysis/blob/ed00173d3f09608593b51cf3ca11208f1952eab4/get-euvd-json-date.py#L18-L45 (under GPL 3.0)
-
-    Deps:
-        from typing import Optional
-        import requests
-        from urllib3.util import Retry
-        from requests.adapters import HTTPAdapter
-        import logging
 
     Args:
         url (str): chosen API's base URL
@@ -127,9 +116,6 @@ def call_nist(app_name: str, cpe: str, from_date: str, to_date: str) -> list:
     Retrieve vulnerabilites from the US NIST database (historical actor),
     filter them and return a list of dictionnaries in the format of YNH's
     security.toml.
-
-    Modules:
-        import time
 
     Args:
         app_name (str): YNH app id
@@ -225,48 +211,49 @@ def call_nist(app_name: str, cpe: str, from_date: str, to_date: str) -> list:
                 break
 
         # Filter out vulnerability reports not yet analyzed (i.e. that may not have CPE nor CVSS) and outside of severity target
-        if status == 'Analyzed' and severity_text in SEVERITY_TARGET:
+        if status != 'Analyzed' and severity_text not in SEVERITY_TARGET:
+			continue
 
-            # More infos link
-            nist_link = 'https://nvd.nist.gov/vuln/detail/' + vuln_id
-            references = cve['references']
-            urls = [nist_link]
-            for ref in references:
-                if 'url' in ref:
-                    urls.append(ref['url'])
+		# More infos link
+		nist_link = 'https://nvd.nist.gov/vuln/detail/' + vuln_id
+		references = cve['references']
+		urls = [nist_link]
+		for ref in references:
+			if 'url' in ref:
+				urls.append(ref['url'])
 
-            #Versions impacted
-            started_with_version = ''
-            fixed_in_version = ''
-            configurations = cve['configurations']
-            for config in configurations:
-                for node in config['nodes']:
-                    cpe_matches = node['cpeMatch']
-                    for cpe_match in cpe_matches:
-                        cpe_criteria = cpe_match['criteria'].split(':')
-                        del cpe_criteria[5:len(cpe_criteria)] #keep only 5 first elements of CPE
-                        cpe_criteria = ':'.join(cpe_criteria) #e.g. cpe:2.3:a:lynxtechnology:twonky_server
-                        if cpe_criteria == cpe:
-                            if 'versionStartIncluding' in cpe_match:
-                                started_with_version = cpe_match['versionStartIncluding']
-                            if 'versionEndExcluding' in cpe_match:
-                                fixed_in_version = cpe_match['versionEndExcluding']
+		#Versions impacted
+		started_with_version = ''
+		fixed_in_version = ''
+		configurations = cve['configurations']
+		for config in configurations:
+			for node in config['nodes']:
+				cpe_matches = node['cpeMatch']
+				for cpe_match in cpe_matches:
+					cpe_criteria = cpe_match['criteria'].split(':')
+					del cpe_criteria[5:len(cpe_criteria)] #keep only 5 first elements of CPE
+					cpe_criteria = ':'.join(cpe_criteria) #e.g. cpe:2.3:a:lynxtechnology:twonky_server
+					if cpe_criteria == cpe:
+						if 'versionStartIncluding' in cpe_match:
+							started_with_version = cpe_match['versionStartIncluding']
+						if 'versionEndExcluding' in cpe_match:
+							fixed_in_version = cpe_match['versionEndExcluding']
 
-            # Generate YNH_APPS_SECURITY entry
-            ynh_app_vulnerability = generate_vulnerability_dict(
-                                                                app_name,
-                                                                vuln_id,
-                                                                pub_date,
-                                                                description,
-                                                                severity_text,
-                                                                urls,
-                                                                started_with_version,
-                                                                fixed_in_version,
-                                                                'danger',
-                                                                'nist'
-                                                                )
+		# Generate YNH_APPS_SECURITY entry
+		ynh_app_vulnerability = generate_vulnerability_dict(
+															app_name,
+															vuln_id,
+															pub_date,
+															description,
+															severity_text,
+															urls,
+															started_with_version,
+															fixed_in_version,
+															'danger',
+															'nist'
+															)
 
-            nist_vulnerabilities_formatted.append(ynh_app_vulnerability)
+		nist_vulnerabilities_formatted.append(ynh_app_vulnerability)
 
     return nist_vulnerabilities_formatted
 
@@ -276,11 +263,6 @@ def call_euvd(app_name: str, app_cpe: str | None, from_date: str, to_date: str) 
     Retrieve vulnerabilites from the European Union Vulnerabilites Database
     (initiated in 2025) filtered by severity and return a list of dictionnaries
     in the format of YNH's security.toml.
-
-    Modules:
-        from datetime import datetime
-        import re
-        import time
 
     Args:
         app_name (str): YNH app id
@@ -437,9 +419,6 @@ def check_app_security(cache_path: Path, app_name: str, app_url: str, from_date_
     For a given app, loads manifest, calls databases, and returns a list of app
         vulnerabilities in the format required for 'security.toml'.
 
-    Modules:
-        import logging
-
     Args:
         app_name (str): app name without '_ynh' suffix
         app_url (str): URL of the github repo of the YNH package
@@ -504,9 +483,6 @@ def check_app_security(cache_path: Path, app_name: str, app_url: str, from_date_
 def convert_severity(value: str | int | float, return_format: str) -> str | int | float:
     """
     Convert severity from value to text or vice-versa.
-
-    Modules:
-        import logging
 
     Args:
         value (str,int,float): severity value in text or number
@@ -576,8 +552,11 @@ def generate_vulnerability_dict(
         [apps.gogs]
             [apps.gogs.cve-2025-00000]
             date = "2025-12-16"
-            title = "Gogs / HIGH - CVE-2025-00000 - Vulnariblity description blah blah blah"
-            more_infos = ["https://nvd.nist.gov/vuln/detail/CVE-2025-00000", https://github.com/owner/app/issues/55]
+            title = "Gogs / HIGH - CVE-2025-00000 - Vulnerability description blah blah blah"
+            more_infos = [
+                "https://nvd.nist.gov/vuln/detail/CVE-2025-00000",
+                "https://github.com/owner/app/issues/55"
+            ]
             started_with_version = ""
             fixed_in_version = ""
             level = "danger"
@@ -620,9 +599,6 @@ def last_security_report_date(source: str, security: dict) -> datetime:
     Return the latest date in the security list for a given source to serve as
     the initial date for a new check
 
-    Modules:
-        from datetime import datetime
-
     Args:
         source (str): 'nist', 'euvd' or 'other'
         security (dict): data loaded from security.toml (dictionnary of lists of one dictionnary)
@@ -640,9 +616,6 @@ def last_security_report_date(source: str, security: dict) -> datetime:
 def indent_tomlkit_nested_tables(item: tomlkit.items.Table, current_level: int = 1, max_level: int = 100, spaces: int = 4 ) -> None:
     """
     Recursively indent tables with increasing spaces based on nesting level.
-
-    Modules:
-        import tomlkit
 
     Args:
         item (tomlkit.items.Table): values of the first level of the tomlkit document
@@ -668,9 +641,6 @@ def make_pull_request(pr_title: str, pr_body: str, pr_head: str) -> None:
     """
     Borrowed from https://github.com/YunoHost/apps_tools/blob/main/update_app_levels/update_app_levels.py#L169,
      with a few changes in the functions args and in the first 11 lines.
-
-     Modules:
-        import requests
 
      Args:
         pr_title (str): title for the pull request
@@ -732,15 +702,6 @@ def show_minutes_or_seconds(seconds: int) -> str:
 def main() -> None:
     """
     Wrapper function that retrieves new vulnerabilities for YNH apps from NIST & EUVD databases to upgrade security.toml
-
-    Modules:
-        import argparse
-        import logging
-        import shutil
-        from pathlib import Path
-        import tomlkit
-        from git import Repo
-        from appslib import get_apps_repo
 
     Args: (argparse ones)
 
@@ -979,36 +940,23 @@ def main() -> None:
 
             make_pull_request(pr_title, pr_changelog, pr_head)
             success_msg = 'Success: Pull request created.'
-            logging.info(success_msg)
-            print(success_msg)
-            time_estimate = show_minutes_or_seconds(time.time() - start_time)
-            logging.info('Execution time: ' + str(time_estimate))
-            logging.info('-------------------------------------------------')
-            logging.info('\n' + pr_changelog)
-            exit()
 
         elif args.write:
             local_save_path = Path(str(Path(__file__).parent) + '/security.toml')
             local_save_path.open('w', encoding='utf-8').write(security_new_toml)
             success_msg = 'Success: security.toml written to ' + str(local_save_path) + '.'
-            logging.info(success_msg)
-            print(success_msg)
-            time_estimate = show_minutes_or_seconds(time.time() - start_time)
-            logging.info('Execution time: ' + str(time_estimate))
-            logging.info('-------------------------------------------------')
-            logging.info('\n' + pr_changelog)
-            exit()
 
         else: #show
             logging.info('\n' + security_new_toml)
             success_msg = 'Success: security.toml printed.'
-            logging.info(success_msg)
-            print(success_msg)
-            time_estimate = show_minutes_or_seconds(time.time() - start_time)
-            logging.info('Execution time: ' + str(time_estimate))
-            logging.info('-------------------------------------------------')
-            logging.info('\n' + pr_changelog)
-            exit()
+
+        # That's all, folks!
+        logging.info(success_msg)
+        print(success_msg)
+        time_estimate = show_minutes_or_seconds(time.time() - start_time)
+        logging.info('Execution time: ' + str(time_estimate))
+        logging.info('-------------------------------------------------')
+        logging.info('\n' + pr_changelog)
 
 
 if __name__ == '__main__':
