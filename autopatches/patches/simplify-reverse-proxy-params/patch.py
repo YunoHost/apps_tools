@@ -30,8 +30,14 @@ FASTCGI_PARAMS_TO_PATCH = [
     "SCRIPT_FILENAME",
 ]
 
-PROXY_HEADERS_TO_PATCH_REGEX = re.compile(rf"(^\s+proxy_set_header\s+({'|'.join(PROXY_HEADERS_TO_PATCH)})\s+\S+\s*;.*$)", re.MULTILINE)
-FASTCGI_PARAMS_TO_PATCH_REGEX = re.compile(rf"(^\s+fastcgi_param\s+({'|'.join(FASTCGI_PARAMS_TO_PATCH)})\s+\S+\s*;.*$)", re.MULTILINE)
+PROXY_HEADERS_TO_PATCH_REGEX = re.compile(
+    rf"(^\s+proxy_set_header\s+({'|'.join(PROXY_HEADERS_TO_PATCH)})\s+\S+\s*;.*$)",
+    re.MULTILINE,
+)
+FASTCGI_PARAMS_TO_PATCH_REGEX = re.compile(
+    rf"(^\s+fastcgi_param\s+({'|'.join(FASTCGI_PARAMS_TO_PATCH)})\s+\S+\s*;.*$)",
+    re.MULTILINE,
+)
 
 OTHER_PATTERNS_TO_REMOVE = [
     r"proxy_http_version\s+1.1;",
@@ -42,23 +48,34 @@ OTHER_PATTERNS_TO_REMOVE = [
     r"include\s+proxy_params;",
     r"include\s+fastcgi_params;",
 ]
-OTHER_PATTERNS_TO_REMOVE_REGEXES = [re.compile(rf"(^\s*{p}\s*$)", re.MULTILINE) for p in OTHER_PATTERNS_TO_REMOVE]
+OTHER_PATTERNS_TO_REMOVE_REGEXES = [
+    re.compile(rf"(^\s*{p}\s*$)", re.MULTILINE) for p in OTHER_PATTERNS_TO_REMOVE
+]
 
 REVERSE_PROXY_STATEMENTS = r"(^(\s*)(fastcgi_pass|proxy_pass)\s+.*;\s*$)"
 REVERSE_PROXY_STATEMENTS_REGEX = re.compile(REVERSE_PROXY_STATEMENTS, re.MULTILINE)
 
 
 def patch(content: str, with_auth: bool) -> str:
-
-    for regex in [PROXY_HEADERS_TO_PATCH_REGEX, FASTCGI_PARAMS_TO_PATCH_REGEX] + OTHER_PATTERNS_TO_REMOVE_REGEXES:
+    for regex in [
+        PROXY_HEADERS_TO_PATCH_REGEX,
+        FASTCGI_PARAMS_TO_PATCH_REGEX,
+    ] + OTHER_PATTERNS_TO_REMOVE_REGEXES:
         for match in regex.findall(content):
             if isinstance(match, tuple):
                 match = match[0]
-            if "proxy_set_header" in match and "Connection" in match and "keep-alive" in match:
+            if (
+                "proxy_set_header" in match
+                and "Connection" in match
+                and "keep-alive" in match
+            ):
                 # Not sure about replacing "Connection keep-alive" which is used by some apps (grafana, kiwix, netdata, piped),
                 # the new default value is supposed to be $connection_upgrade corresponding to "upgrade" or empty string (i think?)
                 continue
-            if "fastcgi_split_path_info" in match and r"^(.+?\.php)(/.*)$;" not in match:
+            if (
+                "fastcgi_split_path_info" in match
+                and r"^(.+?\.php)(/.*)$;" not in match
+            ):
                 # Some apps have a different regex than the default one from the new fastcgi include
                 # though it's unclear why...
                 continue
@@ -72,12 +89,23 @@ def patch(content: str, with_auth: bool) -> str:
     for match, indent, type_ in reverse_proxy_matches:
         match_with_indent = f"\n{indent}{match}"
         if type_ == "fastcgi_pass":
-            content = content.replace(match_with_indent, match_with_indent + f"\n{indent}include fastcgi_params_{suffix};")
+            content = content.replace(
+                match_with_indent,
+                match_with_indent + f"\n{indent}include fastcgi_params_{suffix};",
+            )
         elif type_ == "proxy_pass":
-            if not any(k in match_with_indent for k in ["127.0.0.1", "localhost", "unix:"]):
-                content = content.replace(match_with_indent, match_with_indent + f"\n{indent}include proxy_params_no_auth;")
+            if not any(
+                k in match_with_indent for k in ["127.0.0.1", "localhost", "unix:"]
+            ):
+                content = content.replace(
+                    match_with_indent,
+                    match_with_indent + f"\n{indent}include proxy_params_no_auth;",
+                )
             else:
-                content = content.replace(match_with_indent, match_with_indent + f"\n{indent}include proxy_params_{suffix};")
+                content = content.replace(
+                    match_with_indent,
+                    match_with_indent + f"\n{indent}include proxy_params_{suffix};",
+                )
         else:
             raise Exception(f"Uhoh, what's {type_}?")
 
