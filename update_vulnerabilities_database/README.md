@@ -49,24 +49,24 @@ options:
 ```
 
 ### Performance
-It takes currently ~8s per app to run the script. 
+It takes currently ~8s per app to run the script.
 If run for the full catalog (642 apps as of today), it takes 55mn - 5,1 second per app on average to run due to the fact that some apps do not have a CPE (because it doesn't exist or it was not declared in the app's manifest) - so the lookup is skipped for them.
-Using a [NIST NVD API key](https://nvd.nist.gov/developers/request-an-api-key) is saving an additional 5s per app (to be passed to the script as environment variable `NIST_API_KEY` . 
+Using a [NIST NVD API key](https://nvd.nist.gov/developers/request-an-api-key) is saving an additional 5s per app (to be passed to the script as environment variable `NIST_API_KEY` .
 
 ## TO-DOs
 - [ ] Test the `--pr` feature and fix potentially related bugs.
 - [ ] if is a new app is added the catalog, next run of the script will fetch its vulnerabilities only from last date the script was run (could be the day before or... i.e. not showing recent vulnerabilties at app addition to the database.
 	- There could be a separate action triggered by the event "new app in catalog", running the query from base date again just for the new app, by using the -f parameter which allows to chosing the start date of the period.
 - [ ] Better define danger level.
-	- Define what are possible answers to `level` property in `security.toml` and what they should mean for maintainers and admins: 
-        - "dangerous" vulnerability ? --> automatically append a "Security warning" mention to `doc/PRE_INSTALL.md` and maybe the apps catalog as well.  
+	- Define what are possible answers to `level` property in `security.toml` and what they should mean for maintainers and admins:
+        - "dangerous" vulnerability ? --> automatically append a "Security warning" mention to `doc/PRE_INSTALL.md` and maybe the apps catalog as well.
         - no fix or fix available in another version ? --> notify maintainers about it so they can watch for related news or update the pacakge.
 	- Include EPSS classification (probability of exploitation) and or CISA Known Exploited Vulnerability for more accuracy?
 		- At NIST NVD DB, for one vulnerability report there can be multiple evaluations giving a broad range of CVSS scores for the same app:
 			- different versions of CVSS (currently essentially v3.1 or/and v4.0)
 			- different assessors
 		Depending on the chosen parameters, [this CVE](https://nvd.nist.gov/vuln/detail/CVE-2025-14649) has for instance a severity ranging from Medium, High and Critical.
-	- Mixing CVSS and EPSS and CISA-KEV could help: 
+	- Mixing CVSS and EPSS and CISA-KEV could help:
 		- Filtering out low-risk vulnerabilities with high CVSS but low EPSS (if a critical vulnerability needs physical access to the machine, there would be no emergency in YNH context)
 		- Prioritizing high-risk vulnerabilities with moderate CVSS but high EPSS or in CISA KEV catalog
         - [More infos](https://riskbasedprioritization.github.io/risk/Rbp_schemes/#cvss-base-score-ratings-with-exploitation-focus)
@@ -76,13 +76,14 @@ Using a [NIST NVD API key](https://nvd.nist.gov/developers/request-an-api-key) i
 	- It would very likely require an API key from NIST NVD DB.
 - [ ] Check for modified dates ? For now search relies on vulnerabilities's publication dates. But it could also be made so that it checks for modifications dates and updates existing records in `security.toml` as there might more more infos URLs, a change in classification, or new info regarding a potential fixed version. For now all this follow-up is to be done manually - which nevertheless is not that bad - maintainers should ideally check the links directly and then report in security.toml that they applied the patch to the package.
 - [ ] Looking for missing CPE programmatically? NIST has an other API to lookup for CPE, however that will be difficult to implement with the YunoHost `app_id` as entry key as depending on the apps there may be many answers that need to be sorted manually. Indeed some apps can have a name which is a rather common word which actually different apps, and others are part of a rather large range of products named similarly, each of them having its CPE.
+    - File `cpe_list.diff` in this repo shows referenced CPEs in apps manifests (88 as of 2025-12-28) compared to those referenced in a first listing effort done 2 years ago (174, but maybe not all apps still exist), for a total of 226 unique records.
 - [ ] Support `[system]` section of `security.toml` ?
-- Add [Github Security](https://github.com/nextcloud/security-advisories/security/advisories) as database source ? It may not be that interesting, because NIST NVD and EUVD already reference links to Github Security for CVEs when it makes sense. 
+- Add [Github Security](https://github.com/nextcloud/security-advisories/security/advisories) as database source ? It may not be that interesting, because NIST NVD and EUVD already reference links to Github Security for CVEs when it makes sense.
 
 ## Current dev choices (to be debated)
 - Currently at NIST, only vulnerabilities with an ["Analyzed"](https://nvd.nist.gov/vuln/vulnerability-status#divNvdStatus) status are considered.
 - The `source` property in `security.toml` is currently meant to be one of this 3 values: `nist`, `euvd` or `other` (`other` can be used for manual contributions for instance) . The 2 first ones are used by the script to retrieve the latest report (by date) per source. It is considered as the start period of the lookup query (the end period being the moment of the query). Alternatively, we could imagine storing a `last_update` param at the top of `security.toml`.
-- The product search by CPE (Common Platform Enumeration) is actually not done by full CPE but by what NIST NVD calls Virtual Match String, i.e. the first five portion of the CPE  `cpe:2.3:a:nextcloud:nextcloud`. For reference, the full format version 2.3 of the CPE is: 
+- The product search by CPE (Common Platform Enumeration) is actually not done by full CPE but by what NIST NVD calls Virtual Match String, i.e. the first five portion of the CPE  `cpe:2.3:a:nextcloud:nextcloud`. For reference, the full format version 2.3 of the CPE is:
     ```txt
 	cpe:<cpe_version>:<part>:<vendor>:<product>:<version>:<update>:<edition>:<language>:<sw_edition>:<target_sw>:<target_hw>:<other>
 	```

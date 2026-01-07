@@ -1,0 +1,233 @@
+apps_cache 2025-12-28 compared with https://github.com/ketsapiwiq/ynh-scan/blob/main/cpe.csv
+Each line starts with a character:
+* if "-": in manifest but not listed in cpe.csv
+* if "+": listed in cpe.csv but not in manifest
+* if " ": listed in cpe.csv and already in manifest
+
+-agora,cpe:2.3:a:agora-project:agora-project
+-bookstack,cpe:2.3:a:bookstack:bookstack
+-bookwyrm,cpe:2.3:a:joinbookwyrm:bookwyrm
+-borg,cpe:2.3:a:borg_project:borg
++abantecart,cpe:2.3:a:abantecart:abantecart
++adguardhome,cpe:2.3:a:adguard:adguardhome
++adminer,cpe:2.3:a:adminer:adminer
++airsonic,cpe:2.3:a:airsonic_project:airsonic
++ampache,cpe:2.3:a:ampache:ampache
++askbot,cpe:2.3:a:askbot:askbot
++automad,cpe:2.3:a:automad:automad
++backdrop,cpe:2.3:a:backdropcms:backdrop
++beehive,cpe:2.3:a:beehive_forum:beehive_forum
++blogotext,cpe:2.3:a:blogotext_project:blogotext
++bludit,cpe:2.3:a:bludit:bludit
++bookstack,cpe:2.3:a:bookstackapp:bookstack
++borg,cpe:2.3:a:borgbackup:borg
+ cinny,cpe:2.3:a:cinny_project:cinny
+-civicrm_drupal7,cpe:2.3:a:civicrm:civicrm
+-civicrm_drupal,cpe:2.3:a:civicrm:civicrm
+-collabora,cpe:2.3:a:collabora:online
++cockpit,cpe:2.3:a:agentejo:cockpit
++code-server,cpe:2.3:a:coder:code-server
++codimd,cpe:2.3:a:hackmd:codimd
+ concrete5,cpe:2.3:a:concrete5:concrete5
++converse,cpe:2.3:a:conversejs:converse.js
++coturn,cpe:2.3:a:coturn_project:coturn
+ couchdb,cpe:2.3:a:apache:couchdb
+ cryptpad,cpe:2.3:a:xwiki:cryptpad
+-cyberchef,cpe:2.3:a:gchq:cyberchef
+ discourse,cpe:2.3:a:discourse:discourse
++documize,cpe:2.3:a:documize:documize
++dokuwiki,cpe:2.3:a:dokuwiki:dokuwiki
+ dolibarr,cpe:2.3:a:dolibarr:dolibarr
+ domoticz,cpe:2.3:a:domoticz:domoticz
+-dotclear2,cpe:2.3:a:dotclear:dotclear
+-drupal7,cpe:2.3:a:drupal:drupal
++droppy,cpe:2.3:a:droppy_project:droppy
+ drupal,cpe:2.3:a:drupal:drupal
++easyappointments,cpe:2.3:a:easyappointments:easyappointments
+ elabftw,cpe:2.3:a:elabftw:elabftw
+-element,cpe:2.3:a:matrix:element
+-enafore/manifest.toml:26:# cpe = ???
+-esphome,cpe:2.3:a:esphome:esphome
++emoncms,cpe:2.3:a:openenergymonitor:emoncms
++firefly-iii,cpe:2.3:a:firefly-iii:firefly_iii
+ flarum,cpe:2.3:a:flarum:flarum
++flask,cpe:2.3:a:palletsprojects:flask
++fluxbb,cpe:2.3:a:fluxbb:fluxbb
++focalboard,cpe:2.3:a:mattermost:focalboard
++freepbx,cpe:2.3:a:freepbx:disa
++freshrss,cpe:2.3:a:freshrss:freshrss
++friendica,cpe:2.3:a:friendica:friendica
++galette,cpe:2.3:a:galette:galette
++gateone,cpe:2.3:a:liftoffsoftware:gate_one
++getsimple,cpe:2.3:a:get-simple:getsimple_cms
+ ghost,cpe:2.3:a:ghost:ghost
+ gitea,cpe:2.3:a:gitea:gitea
+ gitlab,cpe:2.3:a:gitlab:gitlab
+-grav,cpe:2.3:a:getgrav:grav
+-halcyon,cpe:2.3:a:halcyon_project:halcyon
+-headscale,cpe:2.3:a:tailscale:tailscale
+-homeassistant,cpe:2.3:a:home-assistant:home-assistant
+-influxdb_v2,cpe:2.3:a:influxdata:influxdb
++gitlab-runner,cpe:2.3:a:gitlab:runner
++gitolite,cpe:2.3:a:gitolite:gitolite
++glpi,cpe:2.3:a:glpi-project:glpi
++gogs,cpe:2.3:a:gogs:gogs
++gollum,cpe:2.3:a:gollum_project:gollum
++grafana,cpe:2.3:a:grafana:grafana
++grocy,cpe:2.3:a:grocy_project:grocy
++grr,cpe:2.3:a:devome:grr
++guacamole,cpe:2.3:a:apache:guacamole
++h5ai,cpe:2.3:a:h5ai_project:h5ai
++hedgedoc,cpe:2.3:a:hedgedoc:hedgedoc
++horde,cpe:2.3:a:horde:horde_application_framework
++hubzilla,cpe:2.3:a:hubzilla:hubzilla
++humhub,cpe:2.3:a:humhub:humhub
++icecoder,cpe:2.3:a:icecoder:icecoder
++ihatemoney,cpe:2.3:a:ihatemoney:i_hate_money
++indexhibit,cpe:2.3:a:indexhibit:indexhibit
++internetarchive,cpe:2.3:a:infogami:infogami
++invoiceninja,cpe:2.3:a:invoiceninja:invoice_ninja
++jappix,cpe:2.3:a:jappix_project:jappix
+ jeedom,cpe:2.3:a:jeedom:jeedom
+ jellyfin,cpe:2.3:a:jellyfin:jellyfin
+-jenkins,cpe:2.3:a:cloudbees:jenkins
++jenkins,cpe:2.3:a:jenkins:jenkins
++jirafeau,cpe:2.3:a:jirafeau:jirafeau
++jitsi,cpe:2.3:a:jitsi:jitsi
++joomla,cpe:2.3:a:joomla:joomla\!
++jupyterlab,cpe:2.3:a:jupyter:nbdime-jupyterlab
++kanboard,cpe:2.3:a:kanboard:kanboard
+ kimai2,cpe:2.3:a:kimai:kimai_2
+-koel,cpe:2.3:a:koel:koel
+-libreerp,cpe:2.3:a:odoo:odoo
++kiwix,cpe:2.3:a:kiwix:kiwix
++kodi,cpe:2.3:a:kodi:kodi
+ limesurvey,cpe:2.3:a:limesurvey:limesurvey
+-lionwiki-t2t,cpe:2.3:a:lionwiki:lionwiki
+-loki,cpe:2.3:a:grafana:loki
+-lxd,cpe:2.3:a:canonical:lxd
+-mailman3,cpe:2.3:a:gnu:mailman
+-mantis,cpe:2.3:a:jenkins:mantis
++lutim,cpe:2.3:a:lutim_project:lutim
++lychee,cpe:2.3:a:lycheeorganisation:lychee-v3
++mailman,cpe:2.3:a:gnu:mailman
++mantis,cpe:2.3:a:mantisbt:mantisbt
+ mastodon,cpe:2.3:a:joinmastodon:mastodon
++matomo,cpe:2.3:a:matomo:matomo
++mattermost,cpe:2.3:a:mattermost:mattermost
++mautic,cpe:2.3:a:acquia:mautic
++mediawiki,cpe:2.3:a:mediawiki:mediawiki
++metabase,cpe:2.3:a:metabase:metabase
++minetest,cpe:2.3:a:minetest:minetest
+ minidlna,cpe:2.3:a:readymedia_project:readymedia
+ minio,cpe:2.3:a:minio:minio
+ misskey,cpe:2.3:a:misskey:misskey
+-mongo-express,cpe:2.3:a:mongo-express_project:mongo-express
++monica,cpe:2.3:a:monicahq:monica
+ monitorix,cpe:2.3:a:fibranet:monitorix
++moodle,cpe:2.3:a:moodle:moodle
+ mosquitto,cpe:2.3:a:eclipse:mosquitto
+ movim,cpe:2.3:a:movim:movim
++munin,cpe:2.3:a:munin-monitoring:munin
++mybb,cpe:2.3:a:mybb:mybb
++mytinytodo,cpe:2.3:a:mytinytodo:mytinytodo
++navidrome,cpe:2.3:a:navidrome:navidrome
++netdata,cpe:2.3:a:netdata:netdata
+ nextcloud,cpe:2.3:a:nextcloud:nextcloud
+-nodered,cpe:2.3:a:nodered:node-red
+-nomad,cpe:2.3:a:hashicorp:nomad
+-ollama,cpe:2.3:a:ollama:ollama
++nocodb,cpe:2.3:a:xgenecloud:nocodb
++nodebb,cpe:2.3:a:nodebb:nodebb
++nodered,cpe:2.3:a:nodered:node-red-dashboard
++nomad,cpe:2.3:a:jenkins:nomad
++ntopng,cpe:2.3:a:ntop:ntopng
++ofbiz,cpe:2.3:a:apache:ofbiz
+ onlyoffice,cpe:2.3:a:onlyoffice:document_server
+ openproject,cpe:2.3:a:openproject:openproject
+-opensearch,cpe:2.3:a:amazon:opensearch
++osticket,cpe:2.3:a:osticket:osticket
++owncast,cpe:2.3:a:owncast_project:owncast
+ owncloud,cpe:2.3:a:owncloud:owncloud
+-pagure,cpe:2.3:a:redhat:pagure
+ peertube,cpe:2.3:a:framasoft:peertube
+-pgadmin,cpe:2.3:a:pgadmin:pgadmin
++pgadmin,cpe:2.3:a:phppgadmin_project:phppgadmin
++phpbb,cpe:2.3:a:phpbb:phpbb
++phpipam,cpe:2.3:a:phpipam:phpipam
++phpldapadmin,cpe:2.3:a:phpldapadmin_project:phpldapadmin
+ phpmyadmin,cpe:2.3:a:phpmyadmin:phpmyadmin
+-pixelfed,cpe:2.3:a:pixelfed:pixelfed
+-pleroma,cpe:2.3:a:kpherox:pleroma
++phpservermon,cpe:2.3:a:phpservermonitor:php_server_monitor
++pihole,cpe:2.3:a:pi-hole:pi-hole
++piwigo,cpe:2.3:a:piwigo:piwigo
++plume,cpe:2.3:a:plume-cms:plume_cms
++pluxml,cpe:2.3:a:pluxml:pluxml
++pmwiki,cpe:2.3:a:pmwiki:pmwiki
++portainer,cpe:2.3:a:portainer:portainer
++prestashop,cpe:2.3:a:prestashop:prestashop
++privatebin,cpe:2.3:a:privatebin:privatebin
++proftpd,cpe:2.3:a:proftpd:proftpd
+ prometheus,cpe:2.3:a:prometheus:prometheus
+-pydio,cpe:2.3:a:pydio:cells
+-qbittorrent,cpe:2.3:a:qbittorrent:qbittorrent
+-sabnzbd,cpe:2.3:a:sabnzbd:sabnzbd
++prosody,cpe:2.3:a:prosody:prosody
++pterodactyl,cpe:2.3:a:pterodactyl:panel
++pydio,cpe:2.3:a:pydio:pydio
++question2answer,cpe:2.3:a:question2answer:question2answer
++radicale,cpe:2.3:a:radicale:radicale
++rainloop,cpe:2.3:a:rainloop:webmail
++redmine,cpe:2.3:a:redmine:redmine
++retroarch,cpe:2.3:a:libretro:retroarch
++riot,cpe:2.3:o:riot-os:riot
++rocketchat,cpe:2.3:a:rocket.chat:rocket.chat
++roundcube,cpe:2.3:a:roundcube:webmail
++samba,cpe:2.3:a:samba:samba
+ seafile,cpe:2.3:a:seafile:seafile
+-simplex,cpe:2.3:a:simplex:simplex_chat
++shaarli,cpe:2.3:a:shaarli_project:shaarli
++shadowsocks,cpe:2.3:a:shadowsocks:shadowsocks-libev
++shellinabox,cpe:2.3:a:shellinabox_project:shellinabox
++shuri,cpe:2.3:a:justsystems:shuriken
++sickrage,cpe:2.3:a:sickrage:sickrage
++sitemagiccms,cpe:2.3:a:sitemagic:sitemagic
++snipeit,cpe:2.3:a:snipeitapp:snipe-it
+ soapbox,cpe:2.3:a:soapbox_project:soapbox
+-sogo,cpe:2.3:a:alinto:sogo
+-squid3,cpe:2.3:a:squid-cache:squid
+-streamlit,cpe:2.3:a:snowflake:streamlit
+-synapse,cpe:2.3:a:matrix:synapse
+-tandoor,cpe:2.3:a:tandoor:recipes
+-technitium-dns,cpe:2.3:a:technitium:dnsserver
+-tooljet,cpe:2.3:a:tooljet:tooljet
+-transmission,cpe:2.3:a:transmissionbt:transmission
++sogo,cpe:2.3:a:inverse:sogo
++sphinx,cpe:2.3:a:sphinxsearch:sphinx
++spip,cpe:2.3:a:spip:spip
++subsonic,cpe:2.3:a:subsonic:subsonic
++sympa,cpe:2.3:a:sympa:sympa
++syncthing,cpe:2.3:a:syncthing:syncthing
++teampass,cpe:2.3:a:teampass:teampass
++tiki,cpe:2.3:a:tiki:tiki
+ trilium,cpe:2.3:a:trilium_project:trilium
+-wallabag2,cpe:2.3:a:wallabag:wallabag
++turtl,cpe:2.3:a:lyonbros:turtl
++unbound,cpe:2.3:a:nlnetlabs:unbound
+ weblate,cpe:2.3:a:weblate:weblate
+-wger,cpe:2.3:a:wger:workout_manager
+-wireguard_client,cpe:2.3:a:pfsense:pfsense-pkg-wireguard
+-woodpecker,cpe:2.3:a:woodpecker-ci:woodpecker
++webmin,cpe:2.3:a:webmin:webmin
++webtrees,cpe:2.3:a:webtrees:webtrees
++wekan,cpe:2.3:a:wekan_project:wekan
++wildfly,cpe:2.3:a:redhat:jboss_wildfly_application_server
++wondercms,cpe:2.3:a:wondercms:wondercms
++wordpress,cpe:2.3:a:wordpress:wordpress
++yeswiki,cpe:2.3:a:yeswiki:yeswiki
++yourls,cpe:2.3:a:yourls:yourls
++yunohost,cpe:2.3:o:yunohost:yunohost
+ zabbix,cpe:2.3:a:zabbix:zabbix
+-zerotier,cpe:2.3:a:zerotier:zerotierone
+
