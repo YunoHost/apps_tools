@@ -739,8 +739,8 @@ def run_autoupdate_for_multiprocessing(data) -> tuple[str, tuple[State, str, str
         try:
             # Wrapping this in a try/except because not 100% convinced it's the right syntax. To be removed later if that doesn't crash the whole thing
             url = e.request.url
-        except Exception as e:
-            url = f"(??? {e} ???) "
+        except Exception as e2:
+            url = f"(??? {e2} ???) "
         message = f"HTTP request failed when fetching {url} ... : {e}"
         return (app, (State.failure, log_str, message, ""))
     except Exception:
