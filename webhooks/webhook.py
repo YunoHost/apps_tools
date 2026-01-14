@@ -309,6 +309,64 @@ def reject_wishlist(request: Request, pr_infos: dict, reason=None) -> HTTPRespon
     if repository != "YunoHost/apps" or not branch.startswith("add-to-wishlist"):
         return response.empty()
 
+    can_reject = False
+    if data["comment"]["author_association"] == "OWNER":
+        can_reject = True
+        logging.info(
+            f"User {user} is an owner of the YunoHost org and can thus reject apps from the wishlist"
+        )
+
+    with requests.Session() as s:
+        s.headers.update({"Authorization": f"token {github_token_membership()}"})
+        r = s.get(
+            f"https://api.github.com/orgs/YunoHost/teams/apps/memberships/{user}"
+        )
+        if r.status_code == 200:
+            can_reject = True
+            logging.info(
+                f"User {user} is in the Apps team"
+            )
+        elif r.status_code == 404:
+            logging.info(
+                f"User {user} is not the Apps team"
+            )
+        else:
+            logging.info(
+                f"Checking for {user} belonging in the Apps team failed with code {r.status_code}"
+            )
+
+    with requests.Session() as s:
+        s.headers.update({"Authorization": f"token {github_token_invitations()}"})
+        r = s.get(
+            f"https://api.github.com/orgs/YunoHost-Apps/teams/regular-contributors/memberships/{user}"
+        )
+        if r.status_code == 200:
+            can_reject = True
+            logging.info(
+                f"User {user} is a Regular Contributor"
+            )
+        elif r.status_code == 404:
+            logging.info(
+                f"User {user} is not a Regular Contributor"
+            )
+        else:
+            logging.info(
+                f"Checking for {user} belonging in the Regular Contributors team failed with code {r.status_code}"
+            )
+
+    if not can_reject:
+        logging.info(
+            f"User {user} is not allowed to reject apps from the wishlist"
+        )
+        with requests.Session() as s:
+            comment_id = data["comment"]["id"]
+            s.headers.update({"Authorization": f"token {github_token()}"})
+            r = s.post(
+                f"https://api.github.com/repos/{repository}/issues/comments/{comment_id}/reactions",
+                json='{"content": "-1"}'
+            )
+        return response.empty()
+
     logging.info(
         f"Will put the suggested app in the rejected list on {repository} branch {branch}..."
     )
