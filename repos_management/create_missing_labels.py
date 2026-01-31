@@ -14,7 +14,7 @@ TOOLS_DIR = Path(__file__).resolve().parent.parent
 
 # API token for yunohost-bot
 token = (TOOLS_DIR / ".github_token").open("r", encoding="utf-8").read().strip()
-g = Github(token)
+g = Github(token, retry=None)
 
 
 def create_missing_labels(args):

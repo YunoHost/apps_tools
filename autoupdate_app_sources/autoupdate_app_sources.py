@@ -74,7 +74,7 @@ def get_github() -> tuple[
         )
 
         auth = (github_login, github_token)
-        github_api = github.Github(github_token)
+        github_api = github.Github(github_token, retry=None)
         author = github.InputGitAuthor(github_login, github_email)
         return auth, github_api, author
     except Exception as e:

@@ -10,7 +10,7 @@ TOOLS_DIR = Path(__file__).resolve().parent.parent
 # API token for yunohost-bot, with "delete_repo" right
 
 token = (TOOLS_DIR / ".github_token").open("r", encoding="utf-8").read().strip()
-g = Github(token)
+g = Github(token, retry=None)
 u = g.get_user("yunohost-bot")
 
 # Let's build a minimalistic summary table
