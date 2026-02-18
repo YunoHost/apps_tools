@@ -46,4 +46,4 @@ sudo yunohost app setting gotosocial upgrade_channel -v testing
 
 ### 📚 App packaging documentation
 
-Please see <https://doc.yunohost.org/packaging_apps> for more information.
+Please see <https://doc.yunohost.org/dev/packaging/> for more information.
