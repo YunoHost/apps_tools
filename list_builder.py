@@ -242,7 +242,7 @@ def get_forum_all_tags():
     url = f"{FORUM_URL}/tags.json"
     try:
         with requests.Session() as s:
-            s.headers.update("Api-Key": FORUM_TOKEN, "Api-Username": "system")
+            s.headers.update({"Api-Key": FORUM_TOKEN, "Api-Username": "system"})
             return s.get(url).json()
     except Exception as e:
         logging.error(f"[List builder] Failed to GET the forum's full tags list: {e}")
@@ -253,7 +253,7 @@ def get_forum_app_tags():
     url = f"{FORUM_URL}/tag_groups/8.json"
     try:
         with requests.Session() as s:
-            s.headers.update("Api-Key": FORUM_TOKEN, "Api-Username": "system")
+            s.headers.update({"Api-Key": FORUM_TOKEN, "Api-Username": "system"})
             return s.get(url).json()
     except Exception as e:
         logging.error(f"[List builder] Failed to GET the forum's apps tags: {e}")
@@ -263,7 +263,7 @@ def put_forum_app_tags(forum_app_tags):
     url = f"{FORUM_URL}/tag_groups/8.json"
     try:
         with requests.Session() as s:
-            s.headers.update("Api-Key": FORUM_TOKEN, "Api-Username": "system")
+            s.headers.update({"Api-Key": FORUM_TOKEN, "Api-Username": "system"})
             return s.put(url, json=forum_app_tags)
     except Exception as e:
         logging.error(f"[List builder] Failed to PUT the forum's apps tags: {e}")
