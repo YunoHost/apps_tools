@@ -11,8 +11,9 @@ venv/
 __pycache__/
 .mypy_cache/
 
-# Github authentication files
+# Authentication files
 .github_*
+.forum_token
 
 # yunohost specific cache/output dirs
 .apps_cache
