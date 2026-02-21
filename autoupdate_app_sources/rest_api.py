@@ -263,5 +263,5 @@ class DownloadPageAPI:
 
         return {
             link.string: urljoin(self.web_page, link.get("href"))
-            for link in soup.find_all("a")
+            for link in soup.find_all("a") if link.string is not None
         }
