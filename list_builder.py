@@ -317,7 +317,7 @@ def main() -> None:
     print("PUT the forum's apps tags list")
     forum_all_tags = get_forum_all_tags()
     forum_app_tags = get_forum_app_tags()
-    if len(forum_all_tags) = 0 or len(forum_app_tags) != 0
+    if len(forum_all_tags) == 0 or len(forum_app_tags) == 0:
         logging.error(f"[List builder] The forum returned empty tags list(s), I will not proceed with tags update.")
     else:
         new_forum_app_tags = create_new_forum_app_tags(forum_all_tags, forum_app_tags, base_catalog)
