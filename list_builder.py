@@ -30,6 +30,8 @@ import appslib.get_apps_repo as get_apps_repo
 
 now = time.time()
 
+FORUM_TOKEN = (TOOLS_DIR / ".forum_token").open("r", encoding="utf-8").read().strip()
+FORUM_URL = "https://forum.yunohost.org"
 
 @cache
 def categories_list():
@@ -235,6 +237,48 @@ def build_app_dict(app, infos, cache_path: Path):
         ),
     }
 
+@cache
+def get_forum_all_tags():
+    url = f"{FORUM_URL}/tags.json"
+    try:
+        with requests.Session() as s:
+            s.headers.update("Api-Key": FORUM_TOKEN, "Api-Username": "system")
+            return s.get(url).json()
+    except Exception as e:
+        logging.error(f"[List builder] Failed to GET the forum's full tags list: {e}")
+        return {}
+
+@cache
+def get_forum_app_tags():
+    url = f"{FORUM_URL}/tag_groups/8.json"
+    try:
+        with requests.Session() as s:
+            s.headers.update("Api-Key": FORUM_TOKEN, "Api-Username": "system")
+            return s.get(url).json()
+    except Exception as e:
+        logging.error(f"[List builder] Failed to GET the forum's apps tags: {e}")
+        return {}
+
+def put_forum_app_tags(forum_app_tags):
+    url = f"{FORUM_URL}/tag_groups/8.json"
+    try:
+        with requests.Session() as s:
+            s.headers.update("Api-Key": FORUM_TOKEN, "Api-Username": "system")
+            return s.put(url, json=forum_app_tags)
+    except Exception as e:
+        logging.error(f"[List builder] Failed to PUT the forum's apps tags: {e}")
+        return {}
+
+def create_new_forum_app_tags(forum_all_tags, forum_app_tags, base_catalog):
+    apps_in_tags = [ tag["name" for tag in forum_app_tags["tag_group"]["tags"] ]
+    apps_in_catalog = base_catalog.keys()
+    missing_app_tags = list(set(apps_in_catalog)-set(apps_in_tags))
+    logging.info(f"[List builder] Here is the list of new forum app tags: {missing_app_tags}")
+    new_id = max(tag["id"] for tag in forum_all_tags["tags"])
+    for tag in missing_app_tags:
+        new_id = new_id + 1
+        forum_app_tags["tag_group"]["tags"].append({'id': new_id, 'name': tag, 'slug': tag})
+    return forum_app_tags
 
 def main() -> None:
     parser = argparse.ArgumentParser()
@@ -269,6 +313,16 @@ def main() -> None:
 
     print(f"Writing the catalogs to {target_dir}...")
     write_catalog_v3(base_catalog, apps_dir, target_dir / "v3")
+
+    print("PUT the forum's apps tags list")
+    forum_all_tags = get_forum_all_tags()
+    forum_app_tags = get_forum_app_tags()
+    if len(forum_all_tags) = 0 or len(forum_app_tags) != 0
+        logging.error(f"[List builder] The forum returned empty tags list(s), I will not proceed with tags update.")
+    else:
+        new_forum_app_tags = create_new_forum_app_tags(forum_all_tags, forum_app_tags, base_catalog)
+        put_forum_app_tags(new_forum_app_tags)
+
     print("Done!")
 
 
