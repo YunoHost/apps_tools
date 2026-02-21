@@ -270,7 +270,7 @@ def put_forum_app_tags(forum_app_tags):
         return {}
 
 def create_new_forum_app_tags(forum_all_tags, forum_app_tags, base_catalog):
-    apps_in_tags = [ tag["name" for tag in forum_app_tags["tag_group"]["tags"] ]
+    apps_in_tags = [ tag["name"] for tag in forum_app_tags["tag_group"]["tags"] ]
     apps_in_catalog = base_catalog.keys()
     missing_app_tags = list(set(apps_in_catalog)-set(apps_in_tags))
     logging.info(f"[List builder] Here is the list of new forum app tags: {missing_app_tags}")
