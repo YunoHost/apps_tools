@@ -30,7 +30,7 @@ import appslib.get_apps_repo as get_apps_repo
 
 now = time.time()
 
-FORUM_TOKEN = (TOOLS_DIR / ".forum_token").open("r", encoding="utf-8").read().strip()
+FORUM_TOKEN = Path(".forum_token").open("r", encoding="utf-8").read().strip()
 FORUM_URL = "https://forum.yunohost.org"
 
 @cache
