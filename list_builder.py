@@ -30,6 +30,9 @@ import appslib.get_apps_repo as get_apps_repo
 
 now = time.time()
 
+TOOLS_DIR = Path(__file__).resolve().parent
+FORUM_TOKEN = (TOOLS_DIR / ".forum_token").open("r", encoding="utf-8").read().strip()
+FORUM_URL = "https://forum.yunohost.org"
 
 @cache
 def categories_list():
@@ -235,6 +238,17 @@ def build_app_dict(app, infos, cache_path: Path):
         ),
     }
 
+def put_forum_app_tags(forum_app_tags):
+    # 8 is the ID of the Applications tags list
+    # We send the whole list, Discourse can manage pre-existing tags 
+    url = f"{FORUM_URL}/tag_groups/8.json"
+    try:
+        with requests.Session() as s:
+            s.headers.update({"Api-Key": FORUM_TOKEN, "Api-Username": "system"})
+            return s.put(url, json={"tag_names": forum_app_tags})
+    except Exception as e:
+        logging.error(f"[List builder] Failed to PUT the forum's apps tags: {e}")
+        return {}
 
 def main() -> None:
     parser = argparse.ArgumentParser()
@@ -269,6 +283,10 @@ def main() -> None:
 
     print(f"Writing the catalogs to {target_dir}...")
     write_catalog_v3(base_catalog, apps_dir, target_dir / "v3")
+
+    print("PUTting the forum's apps tags list")
+    put_forum_app_tags(list(base_catalog.keys()))
+
     print("Done!")
 
 
