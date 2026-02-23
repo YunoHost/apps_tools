@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#!/usr/bin/env python3
 
 import sys
 import argparse
@@ -33,6 +33,7 @@ def generate_READMEs(app_path: Path):
 
     env = Environment(
         loader=FileSystemLoader(README_GEN_DIR),
+        keep_trailing_newline=True
     )
     template = env.get_template("README.md.j2")
 
