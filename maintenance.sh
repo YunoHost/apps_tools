@@ -61,7 +61,7 @@ autoupdate_app_sources() {
     update_apps_repo
     update_apps_cache
     venv/bin/python3 autoupdate_app_sources/autoupdate_app_sources.py \
-        -l .apps -c .apps_cache --latest-commit-weekly --edit --commit --pr --paste -j1
+        -l .apps -c .apps_cache --latest-commit-weekly --edit --commit --pr --paste -j1 --matrix-notification
 }
 
 # shellcheck disable=SC2034

@@ -783,6 +783,12 @@ def main() -> None:
         default=False,
         help="Create a pull request with the changes",
     )
+    parser.add_argument(
+        "--matrix-notification",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Send a matrix notification",
+    )
     parser.add_argument("--paste", action="store_true")
     parser.add_argument(
         "-j", "--processes", type=int, default=multiprocessing.cpu_count()
@@ -868,7 +874,8 @@ def main() -> None:
         "\nAutoupdate dashboard: https://apps.yunohost.org/dash?filter=autoupdate"
     )
 
-    appslib.logging_sender.notify(matrix_message, "apps", markdown=True)
+    if args.matrix_notification:
+        appslib.logging_sender.notify(matrix_message, "apps", markdown=True)
     print(paste_message)
 
 
