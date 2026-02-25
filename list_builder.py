@@ -201,12 +201,8 @@ def build_app_dict(app, infos, cache_path: Path):
         }
 
     # Build the dict with all the infos
-    if (this_app_cache / "manifest.toml").exists():
-        manifest = toml.load(
-            (this_app_cache / "manifest.toml").open("r"), _dict=OrderedDict
-        )
-    else:
-        manifest = json.load((this_app_cache / "manifest.json").open("r"))
+    manifest_file = this_app_cache / "manifest.toml"
+    manifest = toml.load(manifest_file.open("r"), _dict=OrderedDict)
 
     return {
         "id": manifest["id"],
