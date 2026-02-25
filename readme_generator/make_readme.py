@@ -32,8 +32,7 @@ def generate_READMEs(app_path: Path):
             screenshots.append(str(entry.relative_to(app_path)))
 
     env = Environment(
-        loader=FileSystemLoader(README_GEN_DIR),
-        keep_trailing_newline=True
+        loader=FileSystemLoader(README_GEN_DIR), keep_trailing_newline=True
     )
     template = env.get_template("README.md.j2")
 
