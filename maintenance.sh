@@ -3,6 +3,9 @@ set -Eeuo pipefail
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}")"  &> /dev/null && pwd)
 
+: "${APPS_REPO_DIR:=.apps}"
+: "${APPS_CACHE_DIR:=.apps_cache}"
+
 update_venv() {
     if [ ! -d "venv" ]; then
         python3 -m venv venv
@@ -11,15 +14,15 @@ update_venv() {
 }
 
 update_apps_repo() {
-    if [ -d ".apps" ]; then
-        git -C .apps pull
+    if [ -d "$APPS_REPO_DIR" ]; then
+        git -C "$APPS_REPO_DIR" pull
     else
-        git clone https://github.com/YunoHost/apps.git .apps
+        git clone https://github.com/YunoHost/apps.git "$APPS_REPO_DIR"
     fi
 }
 
 update_apps_cache() {
-    venv/bin/python3 ./app_caches.py -d -l .apps -c .apps_cache -j20
+    venv/bin/python3 ./app_caches.py -d -l "$APPS_REPO_DIR" -c "$APPS_CACHE_DIR" -j20
 }
 
 git_pull_and_restart_services() {
@@ -51,7 +54,7 @@ rebuild_catalog() {
     date
     update_apps_repo
     update_apps_cache
-    venv/bin/python3 list_builder.py -l .apps -c .apps_cache ../catalog/default
+    venv/bin/python3 list_builder.py -l "$APPS_REPO_DIR" -c "$APPS_CACHE_DIR" ../catalog/default
 }
 
 # shellcheck disable=SC2034
@@ -61,7 +64,7 @@ autoupdate_app_sources() {
     update_apps_repo
     update_apps_cache
     venv/bin/python3 autoupdate_app_sources/autoupdate_app_sources.py \
-        -l .apps -c .apps_cache --latest-commit-weekly --edit --commit --pr --paste -j1 --matrix-notification
+        -l "$APPS_REPO_DIR" -c "$APPS_CACHE_DIR" --latest-commit-weekly --edit --commit --pr --paste -j1 --matrix-notification
 }
 
 # shellcheck disable=SC2034
@@ -70,7 +73,7 @@ update_app_levels() {
     date
     update_apps_repo
     update_apps_cache
-    venv/bin/python3 update_app_levels/update_app_levels.py -r "git@github.com:YunoHost/apps.git" -c .apps_cache
+    venv/bin/python3 update_app_levels/update_app_levels.py -r "git@github.com:YunoHost/apps.git" -c "$APPS_CACHE_DIR"
 }
 
 main() {
