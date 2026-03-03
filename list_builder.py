@@ -31,7 +31,10 @@ import appslib.get_apps_repo as get_apps_repo
 now = time.time()
 
 TOOLS_DIR = Path(__file__).resolve().parent
-FORUM_TOKEN = (TOOLS_DIR / ".forum_token").open("r", encoding="utf-8").read().strip()
+try:
+    FORUM_TOKEN = (TOOLS_DIR / ".forum_token").open("r", encoding="utf-8").read().strip()
+except:
+    FORUM_TOKEN = ""
 FORUM_URL = "https://forum.yunohost.org"
 
 @cache
@@ -280,8 +283,9 @@ def main() -> None:
     print(f"Writing the catalogs to {target_dir}...")
     write_catalog_v3(base_catalog, apps_dir, target_dir / "v3")
 
-    print("PUTting the forum's apps tags list")
-    put_forum_app_tags(list(base_catalog.keys()))
+    if FORUM_TOKEN != "":
+        print("PUTting the forum's apps tags list")
+        put_forum_app_tags(list(base_catalog.keys()))
 
     print("Done!")
 
