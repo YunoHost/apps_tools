@@ -32,8 +32,13 @@ now = time.time()
 
 TOOLS_DIR = Path(__file__).resolve().parent
 TOKEN_PATH = TOOLS_DIR / ".forum_token"
-FORUM_TOKEN = TOKEN_PATH.open("r", encoding="utf-8").read().strip() if TOKEN_PATH.is_file() else None
+FORUM_TOKEN = (
+    TOKEN_PATH.open("r", encoding="utf-8").read().strip()
+    if TOKEN_PATH.is_file()
+    else None
+)
 FORUM_URL = "https://forum.yunohost.org"
+
 
 @cache
 def categories_list():
@@ -235,12 +240,13 @@ def build_app_dict(app, infos, cache_path: Path):
         ),
     }
 
+
 def put_forum_app_tags(forum_app_tags):
     if FORUM_TOKEN is None:
         logging.warning("FORUM_TOKEN not set, skipping tags update.")
         return {}
     # 8 is the ID of the Applications tags list
-    # We send the whole list, Discourse can manage pre-existing tags 
+    # We send the whole list, Discourse can manage pre-existing tags
     url = f"{FORUM_URL}/tag_groups/8.json"
     try:
         with requests.Session() as s:
@@ -249,6 +255,7 @@ def put_forum_app_tags(forum_app_tags):
     except Exception as e:
         logging.error(f"[List builder] Failed to PUT the forum's apps tags: {e}")
         return {}
+
 
 def main() -> None:
     parser = argparse.ArgumentParser()
