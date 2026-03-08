@@ -102,6 +102,14 @@ async def github_post(request: Request) -> HTTPResponse:
             return on_pr_comment(request, pr_infos)
         else:
             return response.empty()
+        
+    if event == "repository":
+        infos = request.json
+        if infos["action"] == "transferred":
+            repository = infos["repository"]["full_name"]
+            if repository.startswith("YunoHost-Apps/"):
+                logging.info(f"New repository {repository} transferred, inviting the original owner as maintainer...")
+                return invite_user_as_maintainer(infos["sender"]["login"], repository)
 
     return response.json({"error": f"Unknown event '{event}'"}, 422)
 
@@ -464,6 +472,29 @@ def git_repo_rebase_testing_fast_forward(repo: Repo) -> bool:
 
     return False
 
+def invite_user_as_maintainer(github_username: str, repository: str) -> HTTPResponse:
+    r = requests.put(
+        f"https://api.github.com/repos/{repository}/collaborators/{github_username}",
+        headers={
+            "Authorization": f"Bearer {github_token_invitations()}",
+            "Content-Type": "application/json",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        },
+        json={"permission": "maintain"},
+    )
+
+    if r.status_code == 201:
+        print(f"Invited {github_username} to {repository} repository")
+        return response.text("ok")
+    elif r.status_code == 204:
+        print(f"{github_username} is already a collaborator of {repository} repository")
+        return response.text("ok")
+    else:
+        print(
+            f"Failed to invite {github_username} to {repository} repository, status code: {r.status_code}, response: {r.text}"
+        )
+        return response.text("Failed to invite user", status=r.status_code)
 
 def main() -> None:
     parser = argparse.ArgumentParser()
