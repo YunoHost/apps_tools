@@ -1,0 +1,103 @@
+[project]
+name = "yunohost-apps-tools"
+version = "1.0.0"
+description = "YunoHost utilities for apps management"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+authors = [
+    { name = "YunoHost", email = "yunohost@yunohost.org" }
+]
+urls.Repository = "https://github.com/yunohost/dynette"
+
+requires-python = ">=3.13"
+dependencies = [
+    "aiohttp>=3.13.3",
+    "babel>=2.18.0",
+    "beautifulsoup4>=4.14.3",
+    "gitpython>=3.1.46",
+    "jinja2>=3.1.6",
+    "jsonschema>=4.26.0",
+    "lxml>=6.0.2",
+    "pygithub>=2.9.0",
+    "pyyaml>=6.0.3",
+    "requests>=2.32.5",
+    "sanic>=25.12.0",
+    "toml>=0.10.2",
+    "tomlkit>=0.14.0",
+    "tqdm>=4.67.3",
+]
+
+[dependency-groups]
+test = [
+    "ruff",
+    "mypy",
+    "pytest",
+]
+
+[project.scripts]
+
+[tool.setuptools]
+packages = ["appslib"]
+
+[tool.uv]
+package = true
+
+
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+    "YTT",      # flake8-2020
+    "ANN",      # flake8-annotations
+    "BLE",      # flake8-blind-except
+    "B",        # flake8-bugbear
+    "A",        # flake8-builtins
+    "C4",       # flake8-comprehensions
+    "DTZ",      # flake8-datetimez
+    "ISC",      # flake8-implicit-str-concat
+    "ICN",      # flake8-import-conventions
+    "LOG",      # flake8-logging
+    "G",        # flake8-logging-format
+    "PIE",      # flake8-pie
+    "Q",        # flake8-quotes
+    "RET",      # flake8-return
+    "SIM",      # flake8-simplify
+    "SLOT",     # flake8-slots
+    "PTH",      # flake8-use-pathlib
+    "FLY",      # flynt
+    "I",        # isort
+    "N",        # pep8-naming
+    "PERF",     # Perflint
+    "E",        # pycodestyle
+    "W",        # pycodestyle
+    "F",        # Pyflakes
+    "PL",       # Pylint
+    "UP",       # pyupgrade
+    "FURB",     # refurb
+    "RUF",      # Ruff-specific rules
+    "TRY",      # tryceratops
+    # "D",
+]
+ignore = [
+    "ANN401",   # any-type
+    "COM812",   # missing-trailing-comma
+    "D203",     # incorrect-blank-line-before-class
+    "PLR0911",  # too-many-return-statements
+    "PLR0912",  # too-many-branches
+    "PLR0913",  # too-many-arguments
+    "PLR0915",  # too-many-statements
+    "PLR2004",  # magic-value-comparison
+    "UP009",    # utf8-encoding-declaration
+    "TRY003",   # raise-vanilla-args
+    "D100",     # undocumented-public-module
+    "D104",     # undocumented-public-package
+    "D105",     # undocumented-magic-method
+    "D200",     # unnecessary-multiline-docstring
+    "D212",     # multi-line-summary-first-line
+    "D401",     # non-imperative-mood
+]
+
+[tool.mypy]
+strict = true
