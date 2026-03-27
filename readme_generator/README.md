@@ -42,5 +42,5 @@ echo "the_bot_token" > token
 Add the webhook.service to systemd config, then start it:
 
 ```bash
-systemctl start the_webhook_service 
+systemctl start the_webhook_service
 ```
