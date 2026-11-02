@@ -4,13 +4,13 @@ on:
   pull_request:
     types: [opened]
 
-permissions: 
+permissions:
     contents: write #required for 'draft_release' step, cf. https://github.com/softprops/action-gh-release/issues/572
     pull-requests: write #required for 'create/edit PR' step
 
-jobs: 
+jobs:
   ynh-app-release:
-    if: ${{ github.event.pull_request.user.login == 'yunohost-bot' && 
+    if: ${{ github.event.pull_request.user.login == 'yunohost-bot' &&
             startsWith(github.event.pull_request.title, 'Upgrade ') }}
     runs-on: ubuntu-latest
 
@@ -22,12 +22,12 @@ jobs:
 
       - name: Build release
         id: build_release
-        run: | 
+        run: |
           sudo apt install time
           chmod +x scripts/build
           # Run build script while monitoring time & RAM use
           build_log=$(mktemp)
-          /usr/bin/time --format "##Stats##: |Time: %E |Peak RAM (kb): %M" --output="$build_log" ./scripts/build ${{ github.head_ref || github.ref_name }} 
+          /usr/bin/time --format "##Stats##: |Time: %E |Peak RAM (kb): %M" --output="$build_log" ./scripts/build ${{ github.head_ref || github.ref_name }}
           cat $build_log
           # Exports stats (BUILD_STORAGE_USE is already exported within the previous script)
           build_stats=$(cat $build_log | tail -n 1 | grep "##Stats##")

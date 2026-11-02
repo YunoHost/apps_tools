@@ -4,21 +4,21 @@ on:
   push:
     branches: [ "testing" ]
 
-permissions: 
+permissions:
     contents: write #required for 'draft_release' step, cf. https://github.com/softprops/action-gh-release/issues/572
     pull-requests: write #required for 'create/edit PR' step
- 
-jobs: 
+
+jobs:
   ynh-app-release:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v6
-        
+
       - name: Build release
         id: build_release
-        run: | 
+        run: |
           sudo apt install time
           chmod +x scripts/build
           # Run build script while monitoring time & RAM use
@@ -33,7 +33,7 @@ jobs:
           build_ram_use_gb=$(LC_NUMERIC="en_US.UTF-8" printf '%.2f\n' $(echo "$build_ram_use_kb/1024/1024" | bc -l))
           echo "BUILD_TIME=${hhmmss_build_time}" >> $GITHUB_OUTPUT
           echo "PEAK_RAM_USE_GB=${build_ram_use_gb}" >> $GITHUB_OUTPUT
-          
+
       - name: Prepare draft release
         id: draft_release
         uses: softprops/action-gh-release@v2
@@ -87,6 +87,6 @@ jobs:
             exit 0
           else
             echo -e $PR_BODY | gh pr create --base master --head ${CURRENT_BRANCH_NAME} --title 'Upgrade to ${{ steps.build_release.outputs.YNH_RELEASE_VERSION }}' --body-file -
-          fi 
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

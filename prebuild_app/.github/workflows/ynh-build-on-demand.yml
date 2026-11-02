@@ -3,11 +3,11 @@ name: ynh-build-on-demand
 on:
   workflow_dispatch
 
-permissions: 
+permissions:
     contents: write #required for 'draft_release' step, cf. https://github.com/softprops/action-gh-release/issues/572
     pull-requests: write #required for 'create/edit PR' step
 
-jobs: 
+jobs:
   ynh-app-release:
     runs-on: ubuntu-latest
 
@@ -86,6 +86,6 @@ jobs:
             exit 0
           else
             echo -e $PR_BODY | gh pr create --base master --head ${CURRENT_BRANCH_NAME} --title 'Upgrade to ${{ steps.build_release.outputs.YNH_RELEASE_VERSION }}' --body-file -
-          fi 
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

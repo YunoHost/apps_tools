@@ -55,6 +55,7 @@ This may be the most convenient method currently available for package maintaine
 - [it-tools_ynh](https://github.com/Yunohost-Apps/it-tools_ynh) 
 - [jsoncrack_ynh](https://github.com/Yunohost-Apps/jsoncrack_ynh)
 - [fossflow_ynh](https://github.com/Yunohost-Apps/fossflow_ynh)
+- [cinny_ynh](https://github.com/oleole39/cinny_ynh/tree/prebuilt_with_subpath_support)
 
 <a name="proscons-1"></a>
 #### Pros/Cons
@@ -65,7 +66,7 @@ This may be the most convenient method currently available for package maintaine
 
 <a name="what-to-do-1"></a>
 #### What to do
-All required templates mentioned in this section are [available there](https://github.com/oleole39/prebuild-app).
+All required templates mentioned in this section are available in this repo.
 To set it up, you will need to:
 1. **Copy the file `scripts/build`** in your package's repository and adapt the "SECTION TO EDIT" as follows:
     - **Variables**: Adjust variables' content to fit your package. Everything should be filled in, except `gh_personal_token` which can remain empty.
