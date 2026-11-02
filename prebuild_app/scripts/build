@@ -1,0 +1,360 @@
+#!/bin/bash
+
+#=================================================
+# THIS BUILD SCRIPT REQUIRES:
+# |= RAM: ~0.00GB
+# |= Disk space: ~0.00GB
+# |= Time (depends on hardware): ~00:00:00
+#=================================================
+
+#=================================================
+# SECTION TO EDIT
+#=================================================
+
+function ynh_manually_defined_package_variables {
+    #=================================================
+    # VARIABLES TO DEFINE MANUALLY (REQUIRED)
+    #=================================================
+    ynh_owner="Yunohost-Apps"           # YNH repo owner (it only supports GitHub for now) - e.g. "YunoHost-Apps".
+    ynh_repo="myapp_ynh"                # YNH repo name - e.g. "jsoncrack_ynh".
+    upstream_version_source="manifest"  # "manifest" or "latest", depending on whether you want to build the version defined in the manifest or the latest available version upstream. For most cases, use "manifest".
+    upstream_branch_name="main"         # Name of the branch of the upstream repo to get the source from - often "main" or "master".
+    default_build_folder="dist"         # The folder where to find the built files after build - often "dist" for NodeJS (this is generally documented upstream).
+    runtime_environment="nodejs"        # Runtime environment that should be installed - currently only "nodejs" or "none" are supported.
+    build_nodejs_version=20             # NodeJS version to use (if any) for the build.
+
+    # Local build only
+    gh_personal_token=""                # Fill with your GitHub Personal Token if you want to upload the release to GitHub after build - cf. https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens
+}
+
+function ynh_optional_source_customizations {
+    #=================================================
+    # SOURCE CUSTOMIZATION COMMANDS (OPTIONAL)
+    #=================================================
+    echo "this is a placeholder as an empty bash functions generates an error" # Replace with your commands
+}
+
+function ynh_build_instructions {
+    #=================================================
+    # BUILD INSTRUCTIONS (REQUIRED)
+    #=================================================
+    echo "this is a placeholder as an empty bash functions generates an error" # Replace with your commands
+}
+
+#=================================================
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#=================================================
+# YOU SHOULD NOT NEED TO EDIT WHAT FOLLOWS
+#=================================================
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#=================================================
+
+#=================================================
+# HELPERS
+#=================================================
+# Measure disk space use
+function used_disk_space_in_gb {
+  output="$(df -PhBM . | awk 'NR==2 {print $3}')"
+  output=${output%M}
+  output="$(echo "scale=2; $output / 1024" | bc | sed "s/^\./0./")"
+  echo $output
+}
+
+#=================================================
+# INITIATE
+#=================================================
+# Start tracing for debug output
+set -x
+
+storage_start=$(used_disk_space_in_gb)
+
+#=================================================
+# VARIABLES
+#=================================================
+
+# Declare variables filled in manually
+ynh_manually_defined_package_variables
+
+# Parse manifest automatically
+branch_name="${1:-main}" #can be passed to the script as a positional argument or default to main/master branch
+download_branch_manifest=$(curl --silent --show-error --location --write-out '%{http_code}' --output ynh-manifest.toml "https://raw.githubusercontent.com/${ynh_owner}/${ynh_repo}/refs/heads/${branch_name}/manifest.toml")
+if [[ "$download_branch_manifest" = 404 ]]; then
+    # Yunohost's legacy repos have a 'master' branch instead of a 'main' branch
+    download_manifest_master=$(curl --silent --show-error --location --write-out '%{http_code}' --output ynh-manifest.toml "https://raw.githubusercontent.com/${ynh_owner}/${ynh_repo}/refs/heads/master/manifest.toml")
+fi
+manifest_version="$(grep '^version' ynh-manifest.toml | cut -d'"' -f2)"
+upstream_url="$(grep -A 5 'resources.sources.main' ynh-manifest.toml | grep url | grep -o 'http[s]\?://[^ "]\+' | head -1)"
+rm ynh-manifest.toml
+
+# Check that required variables are defined
+required_vars=(ynh_owner ynh_repo upstream_version_source upstream_branch_name default_build_folder runtime_environment upstream_url)
+for var_name in "${required_vars[@]}"; do
+    [ -z "${!var_name}" ] && echo "required $var_name is unset." && required_var_unset=true
+done
+if [ -n "$required_var_unset" ]; then
+    echo "Error - one or more required variables are unset. Please make sure that all required variable are defined in the build script's \"SECTION TO EDIT\" and in the associated resources of the manifest.toml."
+    exit 1
+fi
+
+#=================================================
+# DOWNLOAD AND EXTRACT SOURCE
+#=================================================
+# Parse URL (GitHub)
+github_url_regex="^https://(api.)?github.com/(repos/)?([a-zA-Z0-9._-]*)/([a-zA-Z0-9._-]*)/(releases|archive)?/(refs/tags/|download/)?([a-zA-Z0-9._-]*)(\.tar\.gz|\.zip|/)(.*)$"
+if [[ "$upstream_url" =~ $github_url_regex ]]; then
+    upstream_owner="${BASH_REMATCH[3]}"
+    upstream_repo="${BASH_REMATCH[4]}"
+    upstream_source_type="${BASH_REMATCH[6]}"
+    upstream_tag="${BASH_REMATCH[7]}" #e.g. v3.2.0 (tag or release archive URL) or d5f9bfc7fba1f1908863390f16ba28589d84a7d5 (commit archive URL)
+
+    full_upstream_path="${upstream_owner}/${upstream_repo}"
+
+    if [[ $upstream_source_type == *"download"* ]]; then
+        upstream_source_type="release"
+        if [[ "$upstream_version_source" == "latest" ]]; then
+            upstream_releases_json_url="https://api.github.com/repos/${full_upstream_path}/releases"
+            upstream_tag=$(curl --silent "$upstream_releases_json_url" | jq '.[] | select(( .prerelease == false ) and ( .draft == false )) | .tag_name') | head -n 1 #e.g. v3.2.0 (but format is manually defined by repo upstream authors and could be anything)
+        fi
+        download_url="https://api.github.com/repos/${full_upstream_path}/tarball/${upstream_tag}"
+        build_folder="${upstream_repo}_${upstream_tag}" #e.g. jsoncrack.com_v3.2.0
+        release_version="${upstream_tag}"
+
+    elif [[ $upstream_source_type == *"tags"* ]]; then
+        upstream_source_type="tag"
+        if [[ "$upstream_version_source" == "latest" ]]; then
+            upstream_tags_json_url="https://api.github.com/repos/${full_upstream_path}/tags"
+            upstream_tag=$(curl --silent "$upstream_tags_json_url" | grep -Po "(?<=\"tag_name\": \").*(?=\")") #e.g. v3.2.0 (but format is manually defined by repo upstream authors and could be anything)
+        fi
+        download_url="https://api.github.com/repos/${full_upstream_path}/tarball/refs/tags/${upstream_tag}"
+        build_folder="${upstream_repo}_${upstream_tag}" #e.g. jsoncrack.com_v3.2.0
+        release_version="${upstream_tag}"
+
+    else
+        upstream_source_type="commit"
+        if [[ "$upstream_version_source" == "latest" ]]; then
+            latest_upstream_commit_json_url="https://api.github.com/repos/${full_upstream_path}/commits/${upstream_branch_name}"
+            upstream_tag=$(curl --silent "$latest_upstream_commit_json_url" | grep -Po "(?<=\"sha\": \").*(?=\")" | head -n 1) #e.g. d5f9bfc7fba1f1908863390f16ba28589d84a7d5
+            upstream_tag_short=${upstream_tag:0:8}
+            last_date_tag=$(curl --silent "$latest_upstream_commit_json_url" | grep -Po "(?<=\"verified_at\": \").*(?=\")" | head -n 1) #e.g. 2024-11-19T18:37:03Z
+            last_date_tag_short=$(echo ${last_date_tag:0:10} | sed 's/-/./g') #e.g. 2024.11.19
+        fi
+        download_url="https://github.com/${full_upstream_path}/archive/${upstream_tag}.tar.gz"
+        last_date_tag_short=$(echo $manifest_version | cut -d"~" -f1)
+        upstream_tag_short=${upstream_tag:0:8}
+        build_folder="${upstream_repo}_v${last_date_tag_short}-${upstream_tag_short}" #e.g. jsoncrack.com_v2024.11.19-d5f9bfc7
+        release_version="${build_folder#${upstream_repo}_}"
+    fi
+
+else
+    echo "Error - Wrong GitHub URL supplied"
+    exit 1
+fi
+
+# Download and extract source
+curl -LJ $download_url --output "${build_folder}.tar.gz"
+mkdir "$build_folder"
+tar --strip-components=1 -xvf "${build_folder}.tar.gz" -C "./${build_folder}/"
+storage_extract_source=$(used_disk_space_in_gb)
+
+#=================================================
+# SOURCE CUSTOMIZATION
+#=================================================
+# Optional source customizations
+pushd "$build_folder"
+    # Execute source customizations commands (if any)
+    ynh_optional_source_customizations
+popd
+storage_source_customization=$(used_disk_space_in_gb)
+
+#=================================================
+# INSTALL BUILD ENVIRONMENT
+#=================================================
+# NodeJS - Install required version
+current_node_version=$(node -v | cut -c 2- | cut -c 1-${#build_nodejs_version})
+if [ "$runtime_environment" = "nodejs" ] && [ "$current_node_version" != "$build_nodejs_version" ]; then
+
+    # Install NVM if it is not already installed
+    if [ -z "$(command -v nvm)" ] && [ -z "$NVM_DIR" ]; then
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash #Official install script from https://github.com/nvm-sh/nvm#install--update-scriptn
+    fi
+
+    # Install required NodeJS version
+    source "$HOME/.nvm/nvm.sh"
+    nvm install $build_nodejs_version
+    nvm use $build_nodejs_version
+fi
+
+storage_install_build_runtime_environment=$(used_disk_space_in_gb)
+
+#=================================================
+# BUILD FROM SOURCE
+#=================================================
+ynh_release_filename="${build_folder}_ynh.zip"
+pushd "$build_folder"
+
+    # Execute build instructions
+    ynh_build_instructions
+
+    # Package
+    mv "${default_build_folder}" "${ynh_repo}"
+    zip -r $ynh_release_filename "${ynh_repo}"
+    mv $ynh_release_filename "../${ynh_release_filename}"
+
+popd
+ynh_release_SHA=$(sha256sum ${ynh_release_filename} | cut -d' ' -f1)
+ynh_release_URL="https://github.com/${ynh_owner}/${ynh_repo}/releases/download/${release_version}/${ynh_release_filename}"
+ynh_release_version="${release_version#${upstream_repo}_}" #e.g. v3.2.0 (release/tag source) OR v2024.11.19-d5f9bfc7 (commit source)
+storage_end=$(used_disk_space_in_gb)
+
+# Compute disk usage statistics
+total_storage_used="$(echo "scale=2; $storage_end - $storage_start" | bc | sed "s/^\./0./")"
+total_storage_used_without_runtime_environment="$(echo "scale=2; $storage_end - $storage_install_build_runtime_environment + $storage_source_customization - $storage_start" | bc | sed "s/^\./0./")"
+echo "Total disk space used after build: $total_storage_usedGB (or $total_storage_used_without_runtime_environment GB without $runtime_environment)"
+
+# Clean build folder
+rm -r "${build_folder}"
+rm "${build_folder}.tar.gz"
+
+#=================================================
+# GENERATE CHANGELOG URL
+#=================================================
+if [[ "$upstream_source_type" == "commit" ]]; then #build diff URL (commits history)
+
+    # Get previous commit SHA-1 string
+    if [[ "$upstream_version_source" == "latest" ]]; then #history between current manifest and last upstream commit
+        previous_upstream_filename=${upstream_url##*/}
+        previous_upstream_filename=${previous_upstream_filename%.tar.gz}
+        previous_upstream_filename=${previous_upstream_filename%.zip}
+        previous_release_commit_SHA_short=${previous_release_commit_SHA_full:0:8}
+    else #history between previous manifest and current manifest
+        ynh_releases_json_url="https://api.github.com/repos/${ynh_owner}/${ynh_repo}/releases"
+        last_yhn_releases_names=$(curl --silent "$ynh_releases_json_url" | jq '.[] | select(( .prerelease == false ) and ( .draft == false )) | .tag_name' | head -n 2) #get the two last releases names
+        previous_ynh_release_name="$(echo $last_yhn_releases_names | cut -d' ' -f1)"
+        if [[ "$previous_ynh_release_name" == *"$ynh_release_version"* ]]; then #if a release for the same version that has just been built was already published before
+            previous_ynh_release_name="$(echo $last_yhn_releases_names | cut -d' ' -f2)"
+        fi
+        previous_ynh_release_name=${previous_ynh_release_name//\"/} #e.g. v2025.05.01-9f801cd6
+        previous_release_commit_SHA_short=${previous_ynh_release_name: -8}
+    fi
+
+    # Get current commit SHA-1 string
+    current_release_commit_SHA_short=${ynh_release_version: -8}
+
+    # Create diff URL
+    ynh_release_changelog_url="https://github.com/${full_upstream_path}/compare/${previous_release_commit_SHA_short}...${current_release_commit_SHA_short}"
+
+else #show upstream's release page
+    ynh_release_changelog_url="https://github.com/${full_upstream_path}/releases/tag/${upstream_tag}"
+fi
+
+#=================================================
+# UPLOAD RELEASE (LOCAL BUILD ONLY)
+#=================================================
+if [[ $gh_personal_token && -z $GITHUB_OUTPUT ]]; then
+
+    echo "Trying to upload the release to https://github.com/${ynh_owner}/${ynh_repo}/releases/ ..."
+
+    if [[ "$@" =~ "push_release" ]]; then
+        ## Make a draft release json with a markdown body
+        release='"tag_name": "'$upstream_tag'", "target_commitish": "master", "name": "'$upstream_tag'", '
+        body="${upstream_repo^} prebuilt archive for ${ynh_repo}\\n=========\\nPlease refer to upstream ${upstream_repo^} project for the change : https://github.com/$full_upstream_path/releases\\n\\nSha256sum : $ynh_release_SHA"
+        body=\"$body\"
+        body='"body": '$body', '
+        release=$release$body
+        release=$release'"draft": true, "prerelease": false'
+        release='{'$release'}'
+        url="https://api.github.com/repos/$ynh_owner/$ynh_repo/releases"
+        succ=$(curl -H "Authorization: token $gh_personal_token" --data "$release" $url)
+
+        ## In case of success, we upload a file
+        upload_generic=$(echo "$succ" | grep upload_url)
+        if [[ $? -eq 0 ]]; then
+            echo "Release created."
+        else
+            echo "Error creating release!"
+            return
+        fi
+
+        # $upload_generic is like:
+        # "upload_url": "https://uploads.github.com/repos/:owner/:repo/releases/:ID/assets{?name,label}",
+        upload_prefix=$(echo $upload_generic | cut -d "\"" -f4 | cut -d "{" -f1)
+        upload_file="$upload_prefix?name=$ynh_release_filename"
+
+        echo "Start uploading first file"
+        i=0
+        upload_ok=false
+        while [ $i -le 4 ]; do
+            i=$((i+1))
+            # Download file
+            set +e
+            succ=$(curl -H "Authorization: token $gh_personal_token" \
+                -H "Content-Type: $(file -b --mime-type $ynh_release_filename)" \
+                -H "Accept: application/vnd.github.v3+json" \
+                --data-binary @$ynh_release_filename $upload_file)
+            res=$?
+            set -e
+            if [ $res -ne 0 ]; then
+                echo "Curl upload failled"
+                continue
+            fi
+            echo "Upload done, check result"
+
+            set +eu
+            download=$(echo "$succ" | egrep -o "browser_download_url.+?")
+            res=$?
+            if [ $res -ne 0 ] || [ -z "$download" ]; then
+                set -eu
+                echo "Result upload error"
+                continue
+            fi
+            set -eu
+            echo "$download" | cut -d: -f2,3 | cut -d\" -f2
+            echo "Upload OK"
+            upload_ok=true
+            conclusion_msg="Build completed and successfully uploaded."
+            break
+        done
+
+        if ! $upload_ok; then
+            conclusion_msg="Build completed but not uploaded - upload failed."
+        fi
+    fi
+elif [[ -z $gh_personal_token && -z $GITHUB_OUTPUT ]]; then
+    conclusion_msg="Build completed but not uploaded - missing Github Token."
+fi
+
+#=================================================
+# EXPORT VARIABLES FOR GITHUB WORKFLOW (GITHUB WORKFLOW ONLY)
+#=================================================
+
+if [[ $GITHUB_OUTPUT ]]; then
+    echo "YNH_RELEASE_FILE=${ynh_release_filename}" >> $GITHUB_OUTPUT
+    echo "YNH_RELEASE_SHA=${ynh_release_SHA}" >> $GITHUB_OUTPUT
+    echo "YNH_RELEASE_URL=${ynh_release_URL}" >> $GITHUB_OUTPUT
+    echo "YNH_RELEASE_VERSION=${ynh_release_version}" >> $GITHUB_OUTPUT
+    echo "YNH_RELEASE_CHANGELOG_URL=${ynh_release_changelog_url}" >> $GITHUB_OUTPUT
+    echo "BUILD_STORAGE_USE=${total_storage_used}" >> $GITHUB_OUTPUT
+    echo "BUILD_STORAGE_USE_EXCL_RUNTIME_ENVIRONMENT=${total_storage_used_without_runtime_environment}" >> $GITHUB_OUTPUT
+    echo "BUILD_RUNTIME_ENVIRONMENT_NAME=${runtime_environment}" >> $GITHUB_OUTPUT
+
+    conclusion_msg="Build completed - continuing with the workflow's next step."
+fi
+
+#=================================================
+# CONCLUDE
+#=================================================
+# End debug output tracing
+set +x
+
+# Final status
+if [ -n "$conclusion_msg" ]; then
+    echo $conclusion_msg
+    if [[ $conclusion_msg == *"fail"* ]]; then
+        exit 1
+    else
+        exit 0
+    fi
+else
+    echo "Error in the build script"
+    exit 1
+fi

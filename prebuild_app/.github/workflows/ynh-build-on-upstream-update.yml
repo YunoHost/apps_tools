@@ -1,0 +1,84 @@
+name: ynh-build-on-upstream-update
+
+on:
+  pull_request:
+    types: [opened]
+
+permissions: 
+    contents: write #required for 'draft_release' step, cf. https://github.com/softprops/action-gh-release/issues/572
+    pull-requests: write #required for 'create/edit PR' step
+
+jobs: 
+  ynh-app-release:
+    if: ${{ github.event.pull_request.user.login == 'yunohost-bot' && 
+            startsWith(github.event.pull_request.title, 'Upgrade ') }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.head_ref }} # required for action add-and-commit below, cf. https://github.com/EndBug/add-and-commit#working-with-prs
+
+      - name: Build release
+        id: build_release
+        run: | 
+          sudo apt install time
+          chmod +x scripts/build
+          # Run build script while monitoring time & RAM use
+          build_log=$(mktemp)
+          /usr/bin/time --format "##Stats##: |Time: %E |Peak RAM (kb): %M" --output="$build_log" ./scripts/build ${{ github.head_ref || github.ref_name }} 
+          cat $build_log
+          # Exports stats (BUILD_STORAGE_USE is already exported within the previous script)
+          build_stats=$(cat $build_log | tail -n 1 | grep "##Stats##")
+          build_time=$(echo $build_stats | cut -d"|" -f2 | cut -d" " -f2 | cut -d"." -f1)
+          hhmmss_build_time=$(awk -F: '{if(NF==1) printf "00:00:%02d\n",$1; else if(NF==2) printf "00:%02d:%02d\n",$1,$2; else printf "%02d:%02d:%02d\n",$1,$2,$3}' <<< "$build_time")
+          build_ram_use_kb=$(echo $build_stats | cut -d"|" -f3 | cut -d":" -f2)
+          build_ram_use_gb=$(LC_NUMERIC="en_US.UTF-8" printf '%.2f\n' $(echo "$build_ram_use_kb/1024/1024" | bc -l))
+          echo "BUILD_TIME=${hhmmss_build_time}" >> $GITHUB_OUTPUT
+          echo "PEAK_RAM_USE_GB=${build_ram_use_gb}" >> $GITHUB_OUTPUT
+
+      - name: Prepare draft release
+        id: draft_release
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: ${{ steps.build_release.outputs.YNH_RELEASE_FILE }}
+          fail_on_unmatched_files: true
+          tag_name: ${{ steps.build_release.outputs.YNH_RELEASE_VERSION }}
+          draft: true
+          prerelease: false
+          make_latest: true
+          body: |
+            Version built for Yunohost using `scripts/build` and `.github/workflows/ynh-build-on-upstream-update.yml`.
+            ### Changelog
+            Cf. upstream release note: ${{ steps.build_release.outputs.YNH_RELEASE_CHANGELOG_URL }}
+            ### Build statistics
+            - Execution time: ${{ steps.build_release.outputs.BUILD_TIME }}
+            - Peak RAM used: ${{ steps.build_release.outputs.PEAK_RAM_USE_GB }}GB
+            - Disk space used: ${{ steps.build_release.outputs.BUILD_STORAGE_USE }}GB
+              - Excluding `${{ steps.build_release.outputs.BUILD_RUNTIME_ENVIRONMENT_NAME }}` installation: ${{ steps.build_release.outputs.BUILD_STORAGE_USE_EXCL_RUNTIME_ENVIRONMENT }}GB
+
+      - name: Replace URL & SHA256 in manifest.toml
+        run: |
+          sed -i '/\[resources.sources.ynh_build\]/,/sha256/ {
+              /url/s|=.*$|= "${{ steps.build_release.outputs.YNH_RELEASE_URL }}"|
+              /sha256/s|=.*$|= "${{ steps.build_release.outputs.YNH_RELEASE_SHA }}"|
+          }' manifest.toml
+
+      - name: Commit changes to manifest.toml
+        uses: EndBug/add-and-commit@v9
+        with:
+          default_author: github_actions
+          message: 'Upgrade release in manifest'
+          add: 'manifest.toml'
+
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v1
+        with:
+          message: |
+            Upstream upgrade is now built for YNH and ready to be released in the current repository: ${{ steps.draft_release.outputs.url }}
+            - [ ] Check that upstream upgrade is not likely to break the build script (or edit build script and relaunch app build using the "on-demand" workflow)
+            - [ ] Make sure the built release is published before testing this PR.
+            You may find additional information about this app upgrade's process in the repository's wiki.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
