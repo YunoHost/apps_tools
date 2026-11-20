@@ -569,7 +569,7 @@ class AppAutoUpdater:
             return (
                 latest_version,
                 latest_tarball,
-                api.changelog_for_ref(latest_version, "", RefType.tags),
+                api.changelog_for_ref(latest_version_orig, "", RefType.tags),
             )
 
         if revision_type == "commit":
