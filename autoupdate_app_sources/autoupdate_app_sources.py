@@ -292,16 +292,15 @@ class AppAutoUpdater:
     def relevant_versions(
         tags: list[str], app_id: str, version_regex: Optional[str]
     ) -> tuple[str, str]:
-        def apply_version_regex(tag: str) -> Optional[str]:
+        def apply_version_regex(tag: str) -> Optional[tuple[str, tuple[str, ...]]]:
+            named_groups: tuple[str, ...] = ()
             # First preprocessing according to the manifest version_regex…
             if version_regex:
                 match = re.match(version_regex, tag)
                 if match is None:
                     return None
-                # Basically: either groupdict if named capture gorups, sorted by names, or groups()
-                tag = ".".join(
-                    dict(sorted(match.groupdict().items())).values() or match.groups()
-                )
+                named_groups = tuple(dict(sorted(match.groupdict().items())).values())
+                tag = ".".join(named_groups or match.groups())
 
             if app_id == "photoprism":
                 # Stupid fix for Photoprism whose package version is 2024.x while app version is 24.x
@@ -309,7 +308,7 @@ class AppAutoUpdater:
 
             # Then remove leading v
             tag = tag.lstrip("v")
-            return tag
+            return tag, named_groups
 
         def version_numbers(tag: str) -> Optional[tuple[int, ...]]:
             filter_keywords = ["start", "rc", "beta", "alpha"]
@@ -331,15 +330,23 @@ class AppAutoUpdater:
             print(f"Ignoring tag {t_to_check}, doesn't look like a version number")
             return None
 
-        tags_dict: dict[tuple[int, ...], tuple[str, str]] = {}
+        tags_dict: dict[tuple[tuple[int, ...], ...], tuple[str, str]] = {}
         for tag in tags:
-            tag_clean = apply_version_regex(tag)
-            if tag_clean is None:
+            processed = apply_version_regex(tag)
+            if processed is None:
                 continue
+            tag_clean, named_groups = processed
             tag_as_ints = version_numbers(tag_clean)
             if tag_as_ints is None:
                 continue
-            tags_dict[tag_as_ints] = (tag, tag_clean)
+            if named_groups:
+                groups_as_ints = [version_numbers(group) for group in named_groups]
+                if any(group is None for group in groups_as_ints):
+                    continue
+                sort_key = tuple(group for group in groups_as_ints if group is not None)
+            else:
+                sort_key = (tag_as_ints,)
+            tags_dict[sort_key] = (tag, tag_clean)
 
         if app_id == "focalboard":
             # Stupid ad-hoc patch for focalboard where 7.11.4 doesn't have the proper asset
